@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "bf.h"
 #include "hash_file.h"
@@ -16,11 +17,25 @@
 }
 
 
+
+
+
+
+
+
+//ενας struct που αποθηκευουμε δομες μας
 typedef struct HT {
-	char** table_file;
+	char** table_file;    //πινακας συμβολοσειρων με ονοματα αρχειων(filename)
+  int size_table_file;    //αρχεια
 } HT_tables;
 
+
+//καθολικη μεταβλητη - για τις δομες μας
 HT_tables* tables;
+
+
+
+
 
 /*
  * Η συνάρτηση HT_Init χρησιμοποιείται για την αρχικοποίηση κάποιον δομών που μπορεί να χρειαστείτε. 
@@ -30,6 +45,9 @@ HT_ErrorCode HT_Init()
 {
   //insert code here
   tables = malloc(sizeof(struct HT));
+
+  //αρχικοποιουμε τις δομες μας
+  //το πολυ 20 αρχεια μπορουν να υπαρχουν ανοικτα
   tables->table_file = malloc(20*sizeof(char*));
   if(tables->table_file == NULL)
   {
@@ -44,9 +62,14 @@ HT_ErrorCode HT_Init()
     }
   }
 
-  tables->table_file[0] = "kapa";
+  tables->size_table_file = 0;
   return HT_OK;
 }
+
+
+
+
+
 
 
 /*
@@ -56,9 +79,62 @@ HT_ErrorCode HT_Init()
  */
 HT_ErrorCode HT_CreateIndex(const char *filename, int depth) {
   //insert code here
-  printf("hello:  %s\n",tables->table_file[0]);
+  
+  
+  //μια μεταβλητη bool αν υπαρχει ή οχι
+  int size_table = tables->size_table_file;
+  bool find = false;
+
+  //τσεκαρουμε αν το filename υπαρχει στο πινακα μας
+  for(int i = 0; i < size_table; i++)
+  {
+    char* file = tables->table_file[i];
+    if(strcmp( filename, file) == 0)
+    {
+      find = true;
+      break;
+    }
+  }
+  
+  //αν δεν υπαρχει στο πινακα το εισχωρουμε
+  //και αυξανουμε το size
+  if(find == false)
+  { 
+    if( tables->size_table_file == 20)
+    {
+      return HT_ERROR;
+    }
+    tables->table_file[(tables->size_table_file)++] = filename;
+  }
+  //αν υπαρχει τοτε μυνημα σφαλματος
+  else
+  {
+    return HT_ERROR;
+  }
+
+
+
   return HT_OK;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 HT_ErrorCode HT_OpenIndex(const char *fileName, int *indexDesc){
   //insert code here
