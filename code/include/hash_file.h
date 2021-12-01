@@ -6,6 +6,10 @@ typedef enum HT_ErrorCode {
   HT_ERROR
 } HT_ErrorCode;
 
+
+
+//ena record exei 59 egrafes
+//ara 1 block = 8 records
 typedef struct Record {
 	int id;
 	char name[15];
