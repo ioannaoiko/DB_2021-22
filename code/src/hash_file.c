@@ -112,8 +112,14 @@ HT_ErrorCode HT_CreateIndex(const char *filename, int depth) {
   if(find == false)
   { 
     if( filetable->size_table == 20){ return HT_ERROR;}
-    filetable->table[ filetable->size_table]->filename = filename;
-    filetable->table[ filetable->size_table]->indexdesc = 0;
+
+    //akou edo to kano create
+    FILE *file;
+    file = fopen(filename, "mode");
+
+    //edo to apothikeyo
+    filetable->table[ filetable->size_table]->filename = file;
+    filetable->table[ filetable->size_table]->indexdesc = NULL;
     filetable->table[ filetable->size_table]->hash_table = malloc(sizeof( struct hash_table));
     filetable->size_table = filetable->size_table + 1;
 
@@ -128,15 +134,6 @@ HT_ErrorCode HT_CreateIndex(const char *filename, int depth) {
 
   return HT_OK;
 }
-
-
-
-
-
-
-
-
-
 
 
 
