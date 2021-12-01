@@ -34,12 +34,17 @@ struct file{
 
 typedef struct file* File;
 
+struct file_info{
+  char* filename;
+  int* indexdesc;
+};
 
+typedef struct file_info* File_info;
 
 
 //ενας struct που αποθηκευουμε δομες μας
 struct table_file {
-	File* table;    
+	File_info table[20];    
   int size_table;    //size for table
 };
 
