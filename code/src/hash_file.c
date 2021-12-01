@@ -145,8 +145,6 @@ HT_ErrorCode HT_CreateIndex(const char *filename, int depth) {
 
 
 
-<<<<<<< HEAD
-=======
 
 
 
@@ -159,7 +157,6 @@ HT_ErrorCode HT_CreateIndex(const char *filename, int depth) {
  * Εάν το αρχείο ανοιχτεί κανονικά, η ρουτίνα επιστρέφει HT_OK, ενώ σε διαφορετική περίπτωση κωδικός λάθους.
  */
 
->>>>>>> 3138db6108e22346b8d2ed7fb239ebc2e4198e0b
 HT_ErrorCode HT_OpenIndex(const char *fileName, int *indexDesc){
   //insert code here
   return HT_OK;
