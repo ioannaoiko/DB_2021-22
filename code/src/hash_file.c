@@ -18,34 +18,45 @@
 
 
 
-//hash table for everything file
-struct hash_table{
+// //hash table for everything file
+// struct hash_table{
 
-};
+// };
 
-typedef struct hash_table* HashTable;
+// typedef struct hash_table* HashTable;
 
-//one file have one table_file with filename,indexdesx and one hash table
-struct file{
-  char* filename;
-  int* indexdesc;
-  HashTable hash_table;
-};
+// //one file have one table_file with filename,indexdesx and one hash table
+// struct file{
+//   char* filename;
+//   int* indexdesc;
+//   HashTable hash_table;
+// };
 
-typedef struct file* File;
+// typedef struct file* File;
 
-struct file_info{
+struct file_open{
   char* filename;
   int indexdesc;
   FILE* fptr;
 };
 
-typedef struct file_info* File_info;
+typedef struct file_open* File_open;
+
+struct all_files
+{
+  
+};
+
+typedef struct all_files* AllFiles;
+//dimioytgo prota ena filename ok;
+//ara ftiaxno ena adeio hash table
+//episis ftiaxno kai ena 
 
 
 //ενας struct που αποθηκευουμε δομες μας
 struct table_file {
-	File_info table[20];    
+	File_open table[20];
+  AllFiles* all_files_table;    
   int size_table;    //size for table
 };
 
@@ -68,14 +79,6 @@ HT_ErrorCode HT_Init()
 {
   //insert code here
   filetable = malloc(sizeof(struct table_file));
-
-  //αρχικοποιουμε τις δομες μας
-  //το πολυ 20 αρχεια μπορουν να υπαρχουν ανοικτα
-  // for( int i = 0; i < 20; i++)
-  // {
-  //   filetable->table[i] = malloc(sizeof(struct file_info));
-  //   if( filetable->table[i] == NULL) { return HT_ERROR;}
-  // }
   
   filetable->size_table = 0;
   return HT_OK;
@@ -121,11 +124,6 @@ HT_ErrorCode HT_CreateIndex(const char *filename, int depth) {
     FILE *file;
     file = fopen(filename, "mode");
 
-    //edo to apothikeyo
-    filetable->table[ filetable->size_table]->filename = file;
-    filetable->table[ filetable->size_table]->indexdesc = NULL;
-    filetable->table[ filetable->size_table]->hash_table = malloc(sizeof( struct hash_table));
-    filetable->size_table = filetable->size_table + 1;
 
   }
   //αν υπαρχει τοτε μυνημα σφαλματος
@@ -164,7 +162,7 @@ HT_ErrorCode HT_OpenIndex(const char *fileName, int *indexDesc){
     }
   }
 
-  filetable->table[*indexDesc] = malloc(sizeof(struct file_info));
+  filetable->table[*indexDesc] = malloc(sizeof(struct file_open));
   filetable->table[*indexDesc]->fptr = fptr;
   filetable->table[*indexDesc]->indexdesc = *indexDesc;
   strcpy(filetable->table[*indexDesc]->filename, fileName);
