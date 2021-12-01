@@ -27,6 +27,7 @@
 typedef struct HT {
 	char** table_file;    //πινακας συμβολοσειρων με ονοματα αρχειων(filename)
   int size_table_file;    //αρχεια
+  int* indexdesc;
 } HT_tables;
 
 
@@ -134,7 +135,10 @@ HT_ErrorCode HT_CreateIndex(const char *filename, int depth) {
 
 
 
-
+/*
+ * Η ρουτίνα αυτή ανοίγει το αρχείο με όνομα fileName. 
+ * Εάν το αρχείο ανοιχτεί κανονικά, η ρουτίνα επιστρέφει HT_OK, ενώ σε διαφορετική περίπτωση κωδικός λάθους.
+ */
 
 HT_ErrorCode HT_OpenIndex(const char *fileName, int *indexDesc){
   //insert code here

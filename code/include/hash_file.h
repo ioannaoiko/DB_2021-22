@@ -6,12 +6,20 @@ typedef enum HT_ErrorCode {
   HT_ERROR
 } HT_ErrorCode;
 
+
+
+//egrafi einai 59 bytes
 typedef struct Record {
-	int id;
-	char name[15];
-	char surname[20];
-	char city[20];
+	int id; //4 bytes
+	char name[15]; // 15 bytes
+	char surname[20]; // 20 bytes
+	char city[20]; // 20 bytes
 } Record;
+
+//ena block xoraei 512/63 = 8 eggrafes xoraei
+//prepei na kratame to 8 kapou
+//as poume bucket_size = 4 psaksimooooo
+
 
 /*
  * Η συνάρτηση HT_Init χρησιμοποιείται για την αρχικοποίηση κάποιον δομών που μπορεί να χρειαστείτε. 
