@@ -36,7 +36,8 @@ typedef struct file* File;
 
 struct file_info{
   char* filename;
-  int* indexdesc;
+  int indexdesc;
+  FILE* fptr;
 };
 
 typedef struct file_info* File_info;
@@ -70,13 +71,11 @@ HT_ErrorCode HT_Init()
 
   //αρχικοποιουμε τις δομες μας
   //το πολυ 20 αρχεια μπορουν να υπαρχουν ανοικτα
-  filetable->table = malloc(sizeof(struct file*));
-  if( filetable->table == NULL){ return HT_ERROR;}
-  for( int i = 0; i < 20; i++)
-  {
-    filetable->table[i] = malloc(sizeof(struct file));
-    if( filetable->table[i] == NULL) { return HT_ERROR;}
-  }
+  // for( int i = 0; i < 20; i++)
+  // {
+  //   filetable->table[i] = malloc(sizeof(struct file_info));
+  //   if( filetable->table[i] == NULL) { return HT_ERROR;}
+  // }
   
   filetable->size_table = 0;
   return HT_OK;
@@ -145,18 +144,6 @@ HT_ErrorCode HT_CreateIndex(const char *filename, int depth) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 /*
  * Η ρουτίνα αυτή ανοίγει το αρχείο με όνομα fileName. 
  * Εάν το αρχείο ανοιχτεί κανονικά, η ρουτίνα επιστρέφει HT_OK, ενώ σε διαφορετική περίπτωση κωδικός λάθους.
@@ -164,11 +151,46 @@ HT_ErrorCode HT_CreateIndex(const char *filename, int depth) {
 
 HT_ErrorCode HT_OpenIndex(const char *fileName, int *indexDesc){
   //insert code here
+  
+  if(filetable->size_table == 20){
+    return HT_ERROR;
+  }
+  FILE* fptr = fopen(fileName, 'r+');
+
+  for(int i = 0; i < filetable->size_table; i++){
+    if(filetable->table[i] == NULL){
+      *indexDesc = i;
+      break;
+    }
+  }
+
+  filetable->table[*indexDesc] = malloc(sizeof(struct file_info));
+  filetable->table[*indexDesc]->fptr = fptr;
+  filetable->table[*indexDesc]->indexdesc = *indexDesc;
+  strcpy(filetable->table[*indexDesc]->filename, fileName);
+
+  filetable->size_table++;
+
   return HT_OK;
 }
 
 HT_ErrorCode HT_CloseFile(int indexDesc) {
   //insert code here
+  if(indexDesc >= 20){
+    return HT_ERROR;
+  }
+
+  if(filetable->table[indexDesc] == NULL){
+    return HT_ERROR;
+  }
+
+  char* ptr = filetable->table[indexDesc]->fptr;
+  fclose(ptr);
+
+  free(filetable->table[indexDesc]);
+
+  filetable->size_table--;
+  
   return HT_OK;
 }
 
