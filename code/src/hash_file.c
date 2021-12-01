@@ -18,21 +18,37 @@
 
 
 
+//hash table for everything file
+struct hash_table{
 
+};
+
+typedef struct hash_table* HashTable;
+
+//one file have one table_file with filename,indexdesx and one hash table
+struct file{
+  char* filename;
+  int* indexdesc;
+  HashTable hash_table;
+};
+
+typedef struct file* File;
 
 
 
 
 //ενας struct που αποθηκευουμε δομες μας
-typedef struct HT {
-	char** table_file;    //πινακας συμβολοσειρων με ονοματα αρχειων(filename)
-  int size_table_file;    //αρχεια
-  int* indexdesc;
-} HT_tables;
+struct table_file {
+	File* table;    
+  int size_table;    //size for table
+};
+
+typedef struct table_file* FileTable;
+
 
 
 //καθολικη μεταβλητη - για τις δομες μας
-HT_tables* tables;
+FileTable filetable;
 
 
 
@@ -45,25 +61,19 @@ HT_tables* tables;
 HT_ErrorCode HT_Init() 
 {
   //insert code here
-  tables = malloc(sizeof(struct HT));
+  filetable = malloc(sizeof(struct table_file));
 
   //αρχικοποιουμε τις δομες μας
   //το πολυ 20 αρχεια μπορουν να υπαρχουν ανοικτα
-  tables->table_file = malloc(20*sizeof(char*));
-  if(tables->table_file == NULL)
+  filetable->table = malloc(sizeof(struct file*));
+  if( filetable->table == NULL){ return HT_ERROR;}
+  for( int i = 0; i < 20; i++)
   {
-    return HT_ERROR;
+    filetable->table[i] = malloc(sizeof(struct file));
+    if( filetable->table[i] == NULL) { return HT_ERROR;}
   }
-  for(int i = 0; i < 20; i++)
-  {
-    tables->table_file[i] = malloc(100*sizeof(char));
-    if( tables->table_file[i] == NULL)
-    {
-      return HT_ERROR;
-    }
-  }
-
-  tables->size_table_file = 0;
+  
+  filetable->size_table = 0;
   return HT_OK;
 }
 
@@ -83,13 +93,13 @@ HT_ErrorCode HT_CreateIndex(const char *filename, int depth) {
   
   
   //μια μεταβλητη bool αν υπαρχει ή οχι
-  int size_table = tables->size_table_file;
+  
   bool find = false;
 
   //τσεκαρουμε αν το filename υπαρχει στο πινακα μας
-  for(int i = 0; i < size_table; i++)
+  for(int i = 0; i < filetable->size_table; i++)
   {
-    char* file = tables->table_file[i];
+    char* file = filetable->table[ i]->filename;
     if(strcmp( filename, file) == 0)
     {
       find = true;
@@ -101,11 +111,12 @@ HT_ErrorCode HT_CreateIndex(const char *filename, int depth) {
   //και αυξανουμε το size
   if(find == false)
   { 
-    if( tables->size_table_file == 20)
-    {
-      return HT_ERROR;
-    }
-    tables->table_file[(tables->size_table_file)++] = filename;
+    if( filetable->size_table == 20){ return HT_ERROR;}
+    filetable->table[ filetable->size_table]->filename = filename;
+    filetable->table[ filetable->size_table]->indexdesc = 0;
+    filetable->table[ filetable->size_table]->hash_table = malloc(sizeof( struct hash_table));
+    filetable->size_table = filetable->size_table + 1;
+
   }
   //αν υπαρχει τοτε μυνημα σφαλματος
   else

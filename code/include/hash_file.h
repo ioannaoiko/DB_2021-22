@@ -8,7 +8,8 @@ typedef enum HT_ErrorCode {
 
 
 
-//egrafi einai 59 bytes
+//ena record exei 59 egrafes
+//ara 1 block = 8 records
 typedef struct Record {
 	int id; //4 bytes
 	char name[15]; // 15 bytes
