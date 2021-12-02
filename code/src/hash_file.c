@@ -37,7 +37,7 @@
 struct file_open{
   char* filename;
   int indexdesc;
-  FILE* fptr;
+  int file_desc;
 };
 
 typedef struct file_open* File_open;
@@ -56,7 +56,7 @@ typedef struct all_files* AllFiles;
 //ενας struct που αποθηκευουμε δομες μας
 struct table_file {
 	File_open table[20];
-  AllFiles* all_files_table;    
+  //AllFiles* all_files_table;    
   int size_table;    //size for table
 };
 
@@ -153,7 +153,8 @@ HT_ErrorCode HT_OpenIndex(const char *fileName, int *indexDesc){
   if(filetable->size_table == 20){
     return HT_ERROR;
   }
-  FILE* fptr = fopen(fileName, 'r+');
+  int* file_desc;
+  BF_OpenFile(fileName, file_desc);
 
   for(int i = 0; i < filetable->size_table; i++){
     if(filetable->table[i] == NULL){
@@ -163,7 +164,7 @@ HT_ErrorCode HT_OpenIndex(const char *fileName, int *indexDesc){
   }
 
   filetable->table[*indexDesc] = malloc(sizeof(struct file_open));
-  filetable->table[*indexDesc]->fptr = fptr;
+  filetable->table[*indexDesc]->file_desc = *file_desc;
   filetable->table[*indexDesc]->indexdesc = *indexDesc;
   strcpy(filetable->table[*indexDesc]->filename, fileName);
 
@@ -182,8 +183,8 @@ HT_ErrorCode HT_CloseFile(int indexDesc) {
     return HT_ERROR;
   }
 
-  char* ptr = filetable->table[indexDesc]->fptr;
-  fclose(ptr);
+  int file_desc = filetable->table[indexDesc]->file_desc;
+  BF_CloseFile(file_desc);
 
   free(filetable->table[indexDesc]);
 
