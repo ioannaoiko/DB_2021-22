@@ -12,7 +12,7 @@
   BF_ErrorCode code = call; \
   if (code != BF_OK) {         \
     BF_PrintError(code);    \
-    return HP_ERROR;        \
+    return HT_ERROR;        \
   }                         \
 }
 
@@ -56,11 +56,15 @@ typedef struct all_files* AllFiles;
 //ενας struct που αποθηκευουμε δομες μας
 struct table_file {
 	File_open table[20];
-  //AllFiles* all_files_table;    
   int size_table;    //size for table
 };
 
 typedef struct table_file* FileTable;
+
+
+struct FileInMem{
+  Pointer** table;
+};
 
 
 
@@ -101,37 +105,21 @@ HT_ErrorCode HT_CreateIndex(const char *filename, int depth) {
   
   //μια μεταβλητη bool αν υπαρχει ή οχι
   
-  bool find = false;
+  int file_desc;
 
-  //τσεκαρουμε αν το filename υπαρχει στο πινακα μας
-  for(int i = 0; i < filetable->size_table; i++)
+
+  CALL_BF( BF_CreateFile(filename));
+  CALL_BF( BF_OpenFile( filename, &file_desc));
+
+  Pointer* table;
+  table = malloc(16*sizeof(Pointer*));
+  for( int i = 0; i < 4; i++)
   {
-    char* file = filetable->table[ i]->filename;
-    if(strcmp( filename, file) == 0)
-    {
-      find = true;
-      break;
-    }
+    table[i] = malloc(sizeof(Pointer));
   }
-  
-  //αν δεν υπαρχει στο πινακα το εισχωρουμε
-  //και αυξανουμε το size
-  if(find == false)
-  { 
-    if( filetable->size_table == 20){ return HT_ERROR;}
+  printf("Pointer size: %d\n", sizeof(table));
 
-    //akou edo to kano create
-    FILE *file;
-    file = fopen(filename, "mode");
-
-
-  }
-  //αν υπαρχει τοτε μυνημα σφαλματος
-  else
-  {
-    return HT_ERROR;
-  }
-
+  CALL_BF( BF_CloseFile(file_desc));
 
 
   return HT_OK;

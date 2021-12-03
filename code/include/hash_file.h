@@ -8,6 +8,10 @@ typedef enum HT_ErrorCode {
 
 
 
+// Pointer προς ένα αντικείμενο οποιουδήποτε τύπου. Απλά είναι πιο ευανάγνωστο από το "void*" που μοιάζει με το "void"
+typedef void* Pointer;
+
+
 //ena record exei 59 egrafes
 //ara 1 block = 8 records
 typedef struct Record {

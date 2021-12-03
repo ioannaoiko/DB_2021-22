@@ -23,7 +23,7 @@ OBJS1 = $(EXAMPLES)/ht_main.o $(SRC)/hash_file.o
 
 
 # the executable program
-EXEC = $(BIN)/ht_main
+EXEC = ht_main
 # parameters
 ARGS =
 
@@ -33,6 +33,8 @@ $(EXEC): $(OBJS) $(INCL)
 clean:
 	rm -f $(OBJS1) $(EXEC)
 
+clean_db:
+	rm -v !("Makefile")
 
 run: $(EXEC)
 	./$(EXEC) $(ARGS)
