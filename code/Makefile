@@ -28,6 +28,7 @@ EXEC = ht_main
 ARGS =
 
 $(EXEC): $(OBJS) $(INCL)
+	ht
 	gcc $(OBJS) -o $(EXEC)
 
 clean:

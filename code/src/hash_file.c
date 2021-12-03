@@ -111,13 +111,45 @@ HT_ErrorCode HT_CreateIndex(const char *filename, int depth) {
   CALL_BF( BF_CreateFile(filename));
   CALL_BF( BF_OpenFile( filename, &file_desc));
 
-  Pointer* table;
-  table = malloc(16*sizeof(Pointer*));
-  for( int i = 0; i < 4; i++)
+  BF_Block*** table;
+  table = malloc(depth*sizeof(BF_Block***));
+  for( int i = 0; i < depth; i++)
   {
-    table[i] = malloc(sizeof(Pointer));
+    table[i] = malloc(sizeof(BF_Block**));
+    
   }
-  printf("Pointer size: %d\n", sizeof(table));
+  // printf("Bl size: %d\n", sizeof(table));
+  BF_Block *block;
+  BF_Block_Init(&block);
+
+  printf("eimai do\n");
+  CALL_BF( BF_AllocateBlock( file_desc, block));
+  char* data;
+  printf("eimai do\n");
+  data = BF_Block_GetData(block);
+  printf("eimai don %d\n", depth);
+  memset(data, depth, BF_BLOCK_SIZE);
+  BF_Block_SetDirty(block);
+  data = BF_Block_GetData(block);
+  printf("edwsa data %d\n", data[513]);
+  CALL_BF(BF_UnpinBlock(block));
+
+  //se ena block Plirofories
+  //bathos - filename
+
+
+  //se ena deytero to pointer tou table
+
+  //alla block gia egrafes gia arxi 4
+
+
+
+
+
+
+
+
+
 
   CALL_BF( BF_CloseFile(file_desc));
 
