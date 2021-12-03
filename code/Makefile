@@ -34,7 +34,7 @@ clean:
 	rm -f $(OBJS1) $(EXEC)
 
 clean_db:
-	rm -v !("Makefile")
+	rm *.db
 
 run: $(EXEC)
 	./$(EXEC) $(ARGS)
