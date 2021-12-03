@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <math.h>
 
 #include "bf.h"
 #include "hash_file.h"
@@ -107,17 +108,26 @@ HT_ErrorCode HT_CreateIndex(const char *filename, int depth) {
   
   int file_desc;
 
-
+  CALL_BF(BF_Init(LRU));
   CALL_BF( BF_CreateFile(filename));
   CALL_BF( BF_OpenFile( filename, &file_desc));
 
-  BF_Block*** table;
-  table = malloc(depth*sizeof(BF_Block***));
-  for( int i = 0; i < depth; i++)
-  {
-    table[i] = malloc(sizeof(BF_Block**));
-    
+  //number of pointers in a block
+  int num = BF_BLOCK_SIZE/sizeof(int);
+  //num of blocks required for hash table
+  int a = pow(2,depth);
+  int num_of_blocks = a/num;
+  if(a % num >0){
+    num_of_blocks++;
   }
+
+  // BF_Block*** table;
+  // table = malloc(depth*sizeof(BF_Block***));
+  // for( int i = 0; i < depth; i++)
+  // {
+  //   table[i] = malloc(sizeof(BF_Block**));
+    
+  // }
   // printf("Bl size: %d\n", sizeof(table));
   BF_Block *block;
   BF_Block_Init(&block);
@@ -134,6 +144,21 @@ HT_ErrorCode HT_CreateIndex(const char *filename, int depth) {
   printf("edwsa data %d\n", data[513]);
   CALL_BF(BF_UnpinBlock(block));
 
+  CALL_BF( BF_AllocateBlock( file_desc, block));
+
+  //Πρεπει να το ξαναδω αν σε ενοχλεί βάλτο σε σχόλια μην το σβήσεις.
+  int i = 0;
+  int num_of_ints = 0;
+  while (num_of_ints < a){
+    if(block+i*sizeof(int) > block+BF_BLOCK_SIZE-1){
+      CALL_BF( BF_AllocateBlock( file_desc, block));
+      i = 0;
+    }
+    memcpy(block+i*sizeof(int), num_of_ints, sizeof(int));
+    num_of_ints++;
+    i++;
+  }
+  
   //se ena block Plirofories
   //bathos - filename
 
@@ -141,14 +166,6 @@ HT_ErrorCode HT_CreateIndex(const char *filename, int depth) {
   //se ena deytero to pointer tou table
 
   //alla block gia egrafes gia arxi 4
-
-
-
-
-
-
-
-
 
 
   CALL_BF( BF_CloseFile(file_desc));
