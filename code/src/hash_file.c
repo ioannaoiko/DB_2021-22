@@ -108,14 +108,18 @@ HT_ErrorCode HT_CreateIndex(const char *filename, int depth) {
   
   int file_desc;
 
-  CALL_BF(BF_Init(LRU));
+  // CALL_BF(BF_Init(LRU));
   CALL_BF( BF_CreateFile(filename));
   CALL_BF( BF_OpenFile( filename, &file_desc));
 
   //number of pointers in a block
   int num = BF_BLOCK_SIZE/sizeof(int);
   //num of blocks required for hash table
-  int a = pow(2,depth);
+  int a = 1;
+  for( int i = 0; i < depth; i++)
+  {
+    a = a*2;
+  }
   int num_of_blocks = a/num;
   if(a % num >0){
     num_of_blocks++;
@@ -132,32 +136,32 @@ HT_ErrorCode HT_CreateIndex(const char *filename, int depth) {
   BF_Block *block;
   BF_Block_Init(&block);
 
-  printf("eimai do\n");
   CALL_BF( BF_AllocateBlock( file_desc, block));
-  char* data;
-  printf("eimai do\n");
+  int* data;
+
   data = BF_Block_GetData(block);
-  printf("eimai don %d\n", depth);
-  memset(data, depth, BF_BLOCK_SIZE);
+  memcpy(data, &depth, sizeof(int));
   BF_Block_SetDirty(block);
   data = BF_Block_GetData(block);
-  printf("edwsa data %d\n", data[513]);
+
+  printf("edwsa data %d\n", *data);
+
   CALL_BF(BF_UnpinBlock(block));
 
-  CALL_BF( BF_AllocateBlock( file_desc, block));
+  // CALL_BF( BF_AllocateBlock( file_desc, block));
 
-  //Πρεπει να το ξαναδω αν σε ενοχλεί βάλτο σε σχόλια μην το σβήσεις.
-  int i = 0;
-  int num_of_ints = 0;
-  while (num_of_ints < a){
-    if(block+i*sizeof(int) > block+BF_BLOCK_SIZE-1){
-      CALL_BF( BF_AllocateBlock( file_desc, block));
-      i = 0;
-    }
-    memcpy(block+i*sizeof(int), num_of_ints, sizeof(int));
-    num_of_ints++;
-    i++;
-  }
+  // //Πρεπει να το ξαναδω αν σε ενοχλεί βάλτο σε σχόλια μην το σβήσεις.
+  // int i = 0;
+  // int num_of_ints = 0;
+  // while (num_of_ints < a){
+  //   if(block+i*sizeof(int) > block+BF_BLOCK_SIZE-1){
+  //     CALL_BF( BF_AllocateBlock( file_desc, block));
+  //     i = 0;
+  //   }
+  //   memcpy(block+i*sizeof(int), num_of_ints, sizeof(int));
+  //   num_of_ints++;
+  //   i++;
+  // }
   
   //se ena block Plirofories
   //bathos - filename
