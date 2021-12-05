@@ -73,16 +73,6 @@ struct FileInMem{
 FileTable filetable;
 
 
-//αποθηκευουμε τον αριθμο θεσης πινακα 0,1....,2^depth
-//για καθε θεση σε πoιο block δειχνει
-struct position{
-  int pos;
-  int num_block;
-};
-
-typedef struct position* Position;
-
-
 
 
 
@@ -151,16 +141,17 @@ HT_ErrorCode HT_CreateIndex(const char *filename, int depth) {
   //FOR HASH-TABLE
   while (num_of_ints < a)        //ελεγχουμε αν χωραει στο ιδιο μπλοκ το αρχικο μας hash-table
   {
-    if(data+i*sizeof(struct position) > data+BF_BLOCK_SIZE-1)
+    if(data+i*sizeof(int) > data+BF_BLOCK_SIZE-1)
     {
       CALL_BF( BF_AllocateBlock( file_desc, block));
       data = BF_Block_GetData( block);
       i = 0;
     }
-    Position pos = malloc(sizeof(struct position));
     
-    data = data + i*sizeof(struct position);
-    memcpy( data + i*sizeof(struct position), pos, sizeof(struct position));
+
+    //edo eksigaaa
+    data = data + i*sizeof( int);
+    memcpy( data + i*sizeof(int), &num_of_ints, sizeof( int));
     BF_Block_SetDirty(block);
 
     num_of_ints++;
@@ -172,30 +163,8 @@ HT_ErrorCode HT_CreateIndex(const char *filename, int depth) {
   data = BF_Block_GetData( block);
   for( int i = 0; i < 5; i++)
   {
-    if( i == 0)
-    {
+      data = data + i*sizeof(int);
       printf("EDO EIMAI   %d\n",data[0]);
-    }
-    else
-    {
-      // Position p;
-      if( i == 1)
-      {
-        data = data + i*sizeof(int);
-      }
-      else
-      {
-        data = data +i*sizeof(struct position);
-      }
-
-      Position p;
-      p = data;
-      int n1 = p->pos;
-      int n2 = p->num_block;
-
-      printf("EDO EIMAI   %d -- %d size:%d\n", n1, n2, sizeof(struct position));
-    }
-
 
   }
 
