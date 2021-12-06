@@ -289,6 +289,88 @@ int HashFunction( Record record, int depth)
 
 }
 
+HT_ErrorCode CreateNewHashTable( int filedesc)
+{ 
+  BF_Block* block;
+  BF_Block_Init( &block);
+
+  int blocks_num;
+  BF_GetBlockCounter( filedesc, &blocks_num);
+  if(blocks_num < 5)  { return HT_ERROR;}
+  
+  CALL_BF( BF_GetBlock(filedesc, 0, block));
+
+  char* data;
+  data = BF_Block_GetData(block);
+  int depth = data[0];
+  // depth = 8;
+  printf("EXO dep: %d\n", depth);
+  int a = 1;
+  for( int i = 0; i < depth; i++)
+  {
+    a = a*2;
+  }
+  //prepei na vro posa block eixa gia to hash table
+  //1o block ------- 127 theseis gia hash
+  //2o block ------- 128 theseis gia hash
+  //3o block ------- 128 theseis gia hash
+  //...
+  //...
+  //...
+  //N-osto block --- 128 theseis gia hash
+  int num_block_hash_before = 1;
+  if( depth >= 7)
+  {
+    int el = a;
+    el = el -127; //afairo apo to 1o block
+    int other_blocks = el%depth; 
+    printf("other:  %d\n", other_blocks);
+    num_block_hash_before = num_block_hash_before + other_blocks;
+  }
+
+  //FOR NEW HASh
+  depth++;
+  int previous_a = a;
+  int previous_depth = depth - 1;
+  a = a*2;
+  int num_block_hash_new = 1;
+  if( depth >= 7)
+  {
+    int el = a;
+    el = el -127; //afairo apo to 1o block
+    int other_blocks = el%depth; 
+    printf("other:  %d\n", other_blocks);
+    num_block_hash_new = num_block_hash_new + other_blocks;
+  }
+
+  int different = num_block_hash_new - num_block_hash_before;
+  if(different == 0)
+  {
+  //  data = BF_Block_GetData(block) + sizeof(int); //pairno to data
+    // BF_block
+    //FOR HASH-TABLE
+    int num_of_ints = previous_a;
+    int bucket_point = -1 //arxika den xasarei poythena deixnei sto bucket -1
+    while (num_of_ints < a)        //ελεγχουμε αν χωραει στο ιδιο μπλοκ το αρχικο μας hash-table
+    {
+      // CALL_BF( BF_AllocateBlock( file_desc, block));
+        // data = BF_Block_GetData( block);
+        // i = 0;
+  
+      memcpy( data + i*sizeof(int), &num_of_ints, sizeof( int));
+      BF_Block_SetDirty(block);
+
+      num_of_ints++;
+      i++;
+    } 
+  }
+  return HT_OK;
+}
+HT_ErrorCode CreateNewBucket( int filedesc)
+{
+  
+}
+
 HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
   //insert code here
 
@@ -386,6 +468,18 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
     //tote edo exoume thema me to block
     //eksetazoume periptoseis'
     printf("kalinictaaaa\n");
+    data = BF_Block_GetData(block);
+    int depth_bucket = data[0];
+    printf("edo to d:  %d\n", depth_bucket);
+
+    if( depth == depth_bucket)
+    {
+      CreateNewHashTable( filedesc);
+    }
+    else
+    {
+      CreateNewBucket( filedesc);
+    }
     return HT_ERROR;
   
   }
@@ -394,7 +488,6 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
   else
   {
     //id
-    printf("id :: %d\n",id);
     memcpy( data + k*sizeof(record) , &id, sizeof(int));
     BF_Block_SetDirty(block);
 
@@ -412,39 +505,38 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
   }
 
 
-  //PRINTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
-  data = BF_Block_GetData( block) + sizeof(int);
-  int* d1;
-  k = 0;
-  while( k < (BF_BLOCK_SIZE-sizeof(int))/sizeof(record))
-  {   
+  // // //PRINTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
+  // data = BF_Block_GetData( block) + sizeof(int);
+  // int* d1;
+  // k = 0;
+  // while( k < (BF_BLOCK_SIZE-sizeof(int))/sizeof(record))
+  // {   
 
-      d1 = data + k*sizeof(record);
-      int id = d1[0];
-
-
-      char* d2 = data + k*sizeof(record) + sizeof(int);
-      // char* nam = d2[0];
-      // char nam[15];
-      strcpy(name, d2);
-      // printf(" elaa %s\n", d2[0]);
-
-      // d1 = data + k*sizeof(record) + sizeof(int) + sizeof(name);
-      // char* snam = d1[0];
+  //     d1 = data + k*sizeof(record);
+  //     int id = d1[0];
 
 
-      // d1 = data + k*sizeof(record) + sizeof(int) + sizeof(name) + sizeof(surname);
-      // char* cit = d1[0];
+  //     char* d2 = data + k*sizeof(record) + sizeof(int);
+  //     // char* nam = d2[0];
+  //     // char nam[15];
+  //     strcpy(name, d2);
+  //     // printf(" elaa %s\n", d2[0]);
+
+  //     // d1 = data + k*sizeof(record) + sizeof(int) + sizeof(name);
+  //     // char* snam = d1[0];
+
+
+  //     // d1 = data + k*sizeof(record) + sizeof(int) + sizeof(name) + sizeof(surname);
+  //     // char* cit = d1[0];
       
-
-      if( name == NULL)
-      {
-        break;
-      }
-      printf("to record mas me stoixeia id: %d kai name %s\n", id, name);
-      k++;
+  //     if( name == NULL || strlen( name) == 0)
+  //     {
+  //       break;
+  //     }
+  //     printf("to record mas me stoixeia id: %d kai name %s\n", id, name);
+  //     k++;
       
-  }
+  // }
 
   
 
@@ -457,4 +549,3 @@ HT_ErrorCode HT_PrintAllEntries(int indexDesc, int *id) {
   //insert code here
   return HT_OK;
 }
-

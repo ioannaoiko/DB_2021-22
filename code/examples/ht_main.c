@@ -81,7 +81,6 @@ int main() {
     record.id = id;
   
     r = rand() % 12;
-    printf("dinei onoma: %s  \n", names[r]);
     memcpy(record.name, names[r], strlen(names[r]) + 1);
     r = rand() % 12;
     memcpy(record.surname, surnames[r], strlen(surnames[r]) + 1);
