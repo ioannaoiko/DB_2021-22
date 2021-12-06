@@ -414,33 +414,34 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
 
   //PRINTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
   data = BF_Block_GetData( block) + sizeof(int);
+  int* d1;
   k = 0;
   while( k < (BF_BLOCK_SIZE-sizeof(int))/sizeof(record))
   {   
 
-      d = data + k*sizeof(record);
-      int id = d[0];
+      d1 = data + k*sizeof(record);
+      int id = d1[0];
 
 
-      d = data + k*sizeof(record) + sizeof(int);
-      char* nam = d[0];
+      char* d2 = data + k*sizeof(record) + sizeof(int);
+      // char* nam = d2[0];
+      // char nam[15];
+      strcpy(name, d2);
+      // printf(" elaa %s\n", d2[0]);
+
+      // d1 = data + k*sizeof(record) + sizeof(int) + sizeof(name);
+      // char* snam = d1[0];
 
 
-      d = data + k*sizeof(record) + sizeof(int) + sizeof(name);
-      char* snam = d[0];
-
-
-      d = data + k*sizeof(record) + sizeof(int) + sizeof(name) + sizeof(surname);
-      char* cit = d[0];
+      // d1 = data + k*sizeof(record) + sizeof(int) + sizeof(name) + sizeof(surname);
+      // char* cit = d1[0];
       
 
-      //skaei edooooooooooo
-      printf("to record mas me stoixeia id: %d kai name %s\n", id, name);
-      char* nam1 = d[0];
-      if( nam1 == NULL)
+      if( name == NULL)
       {
         break;
       }
+      printf("to record mas me stoixeia id: %d kai name %s\n", id, name);
       k++;
       
   }
