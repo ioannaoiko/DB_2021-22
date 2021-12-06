@@ -70,26 +70,27 @@ int main() {
   CALL_OR_DIE(HT_CreateIndex(FILE_NAME, GLOBAL_DEPT));
 
 
-  // CALL_OR_DIE(HT_OpenIndex(FILE_NAME, &indexDesc)); 
+  CALL_OR_DIE(HT_OpenIndex(FILE_NAME, &indexDesc)); 
 
-  // Record record;
-  // srand(12569874);
-  // int r;
-  // printf("Insert Entries\n");
-  // for (int id = 0; id < RECORDS_NUM; ++id) {
-  //   // create a record
-  //   record.id = id;
-  //   printf("einai tosa: %d\n", sizeof(record));
+  Record record;
+  srand(12569874);
+  int r;
+  printf("Insert Entries\n");
+  for (int id = 0; id < RECORDS_NUM; ++id) {
+    // create a record
+    record.id = id;
+    printf("einai tosa: %d\n", sizeof(record));
   
-  //   r = rand() % 12;
-  //   memcpy(record.name, names[r], strlen(names[r]) + 1);
-  //   r = rand() % 12;
-  //   memcpy(record.surname, surnames[r], strlen(surnames[r]) + 1);
-  //   r = rand() % 10;
-  //   memcpy(record.city, cities[r], strlen(cities[r]) + 1);
+    r = rand() % 12;
+    memcpy(record.name, names[r], strlen(names[r]) + 1);
+    r = rand() % 12;
+    memcpy(record.surname, surnames[r], strlen(surnames[r]) + 1);
+    r = rand() % 10;
+    memcpy(record.city, cities[r], strlen(cities[r]) + 1);
 
-  //   CALL_OR_DIE(HT_InsertEntry(indexDesc, record));
-  // }
+    CALL_OR_DIE(HT_InsertEntry(indexDesc, record));
+    break;
+  }
 
   // printf("RUN PrintAllEntries\n");
   // int id = rand() % RECORDS_NUM;
@@ -97,6 +98,6 @@ int main() {
   // //CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
 
 
-  // CALL_OR_DIE(HT_CloseFile(indexDesc));
+  CALL_OR_DIE(HT_CloseFile(indexDesc));
   BF_Close();
 }
