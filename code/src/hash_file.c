@@ -179,8 +179,8 @@ HT_ErrorCode HT_CreateIndex(const char *filename, int depth) {
 
 
   //Unpin the blocks
-  int blocks_num;
-  CALL_BF( BF_GetBlockCounter( file_desc, &blocks_num));
+  // int blocks_num;
+  // CALL_BF( BF_GetBlockCounter( file_desc, &blocks_num));
   
 
   //PRINTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
@@ -285,7 +285,7 @@ int HashFunction( Record record, int depth)
 
   int id = record.id;
   id = id >> sizeof(int) - depth;
-  printf("id == %d", id);
+  return id;
 
 }
 
@@ -304,30 +304,150 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
   {
     return HT_ERROR;
   }
-  printf("num:    %d\n", filedesc);
 
 
   int i = 0;
 
-  // for( int i = 0; i < blocks_num; i++)
-  // {
-    // CALL_BF( BF_GetBlock(file_desc, i, block));
-    // CALL_BF( BF_UnpinBlock( block));
-  // }
+  //GetBlock with data
   CALL_BF(BF_GetBlock(filedesc, i, block));
-  // int* data = BF_Block_GetData(block); 
   char* data;
   data = BF_Block_GetData( block);
-  for( int i = 0; i < 5; i++)
+
+  //depth 
+  int depth = data[0];
+  
+  //Hashing
+  int HashNum = HashFunction( record, depth);
+
+  int a = 1;
+  for( int i = 0; i < depth; i++)
   {
-      int* d = data + i*sizeof(int);
-      printf("EDO EIMAI   %d data:  %d\n",d[0], d);
+    a = a*2;
+  }
+
+  //paikse me bathosssssssssssssssssssssssssssss 7...............
+  int* d;
+  int num_block_hash = 2;
+  HashNum++; //128
+  while( data+ HashNum*sizeof(int) > data+BF_BLOCK_SIZE-1 )
+  {
+    i++;
+    CALL_BF(BF_GetBlock(filedesc, i, block));
+    data = BF_Block_GetData( block);
+    if( i == 1)
+    {
+      HashNum = HashNum - 127;
+    }
+    else
+    {
+      HashNum = HashNum - 128;
+    }
+    num_block_hash++;
 
   }
-  
-  printf("dep:  %d\n", data[0]);
-  // HashFunction( record, depth);
 
+  
+  d = data + HashNum*sizeof(int);
+  int bucket = d[0];
+  
+  int num_blocks;
+  BF_GetBlockCounter( filedesc, &num_blocks);
+  BF_GetBlock( filedesc, num_block_hash + bucket, block);
+  data = BF_Block_GetData( block);
+  d = data + sizeof(int);
+  int k = 0;
+
+  while( k < (BF_BLOCK_SIZE-sizeof(int))/sizeof(record))
+  {
+      d = data + k*sizeof(record) + sizeof(int);
+      char* nam1 = d[0];
+      if( nam1 == NULL)
+      {
+        break;
+      }
+      k++;
+      
+  }
+
+  int id = record.id;
+  char name[15];
+  strcpy(name, record.name);
+
+  char surname[20];
+  strcpy(surname, record.surname);
+  
+  char city[20];
+  strcpy(city, record.city);
+
+
+  data = BF_Block_GetData( block) + sizeof(int);
+  if( k == (BF_BLOCK_SIZE-sizeof(int))/sizeof(record))
+  {
+    //tote edo exoume thema me to block
+    //eksetazoume periptoseis'
+    printf("kalinictaaaa\n");
+    return HT_ERROR;
+  
+  }
+  //AN DN EINAI gemato to block mas poy ginetai to hashing tote vazoume to record
+  //kai den exoyme kanena thema
+  else
+  {
+    //id
+    printf("id :: %d\n",id);
+    memcpy( data + k*sizeof(record) , &id, sizeof(int));
+    BF_Block_SetDirty(block);
+
+    //name
+    memcpy( data + k*sizeof(record) + sizeof(int) , name, sizeof(name));
+    BF_Block_SetDirty(block);
+
+    //surname
+    memcpy( data + k*sizeof(record) + sizeof(int) + sizeof(name) , surname, sizeof(surname));
+    BF_Block_SetDirty(block);
+
+    //surname
+    memcpy( data + k*sizeof(record) + sizeof(int) + sizeof(name) + sizeof(surname), city, sizeof(city));
+    BF_Block_SetDirty(block);
+  }
+
+
+  //PRINTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
+  data = BF_Block_GetData( block) + sizeof(int);
+  k = 0;
+  while( k < (BF_BLOCK_SIZE-sizeof(int))/sizeof(record))
+  {   
+
+      d = data + k*sizeof(record);
+      int id = d[0];
+
+
+      d = data + k*sizeof(record) + sizeof(int);
+      char* nam = d[0];
+
+
+      d = data + k*sizeof(record) + sizeof(int) + sizeof(name);
+      char* snam = d[0];
+
+
+      d = data + k*sizeof(record) + sizeof(int) + sizeof(name) + sizeof(surname);
+      char* cit = d[0];
+      
+
+      //skaei edooooooooooo
+      printf("to record mas me stoixeia id: %d kai name %s\n", id, name);
+      char* nam1 = d[0];
+      if( nam1 == NULL)
+      {
+        break;
+      }
+      k++;
+      
+  }
+
+  
+
+  // printf("num bllll:  gioxann:    %d --- tsosmi: %d\n", num_of_hashblocks, num_block_hash);
   BF_Block_Destroy( &block);
   return HT_OK;
 }

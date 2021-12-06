@@ -79,7 +79,6 @@ int main() {
   for (int id = 0; id < RECORDS_NUM; ++id) {
     // create a record
     record.id = id;
-    printf("einai tosa: %d\n", sizeof(record));
   
     r = rand() % 12;
     memcpy(record.name, names[r], strlen(names[r]) + 1);
@@ -89,7 +88,7 @@ int main() {
     memcpy(record.city, cities[r], strlen(cities[r]) + 1);
 
     CALL_OR_DIE(HT_InsertEntry(indexDesc, record));
-    break;
+    // break;
   }
 
   // printf("RUN PrintAllEntries\n");
