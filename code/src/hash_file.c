@@ -116,6 +116,16 @@ HT_ErrorCode HT_CreateIndex(const char *filename, int depth) {
   memcpy(data, &depth, sizeof(int));
   BF_Block_SetDirty(block);
 
+  data = data + sizeof(int);
+  int hash_block_index = 1;
+  memcpy(data, &hash_block_index, sizeof(int));
+  BF_Block_SetDirty(block);
+
+  data = data + sizeof(int);
+  int end = -1;
+  memcpy(data, &end, sizeof(int));
+  BF_Block_SetDirty(block);
+
   // printf("elaa create %s -- %d\n", filename, file_desc);
   //number of pointers in a block
   int num = BF_BLOCK_SIZE/sizeof(int);
@@ -292,8 +302,7 @@ int HashFunction( Record record, int depth)
 
 }
 
-HT_ErrorCode CreateNewBucket( int filedesc, Record record)
-{
+HT_ErrorCode CreateNewBucket( int filedesc, Record record, int bucket){
   BF_Block* block;
   BF_Block_Init(&block);
 
@@ -302,6 +311,54 @@ HT_ErrorCode CreateNewBucket( int filedesc, Record record)
 
   int blocks_num;
   BF_GetBlockCounter( filedesc, &blocks_num);
+  int dest = blocks_num - 1;
+
+  int i = 1;
+  CALL_BF(BF_GetBlock(filedesc, i, block));
+  data = BF_Block_GetData(block);
+  int* d = data;
+  int count = 0;
+  
+  while(d[0] <= bucket){
+    if(d[0] == bucket){
+      count++;
+    }
+
+    d += sizeof(int);
+    if(d > data + BF_BLOCK_SIZE-1){
+      
+      CALL_BF(BF_GetBlock(filedesc, 0, block));
+      char* data1 = BF_Block_GetData(block);
+      while(data1[0] <= i){
+        data1+=sizeof(int);
+      }
+      
+      i = data1[0];
+      CALL_BF(BF_GetBlock(filedesc, data1[0], block));
+      data = BF_Block_GetData(block);
+      d = data;
+    }
+  }
+  int j = 0;
+  for(i = 0; i < count/2; i++){
+    d-=sizeof(int);
+    if(d < data){
+      j++;
+      CALL_BF(BF_GetBlock(filedesc, 0, block));
+      char* data1 = BF_Block_GetData(block);
+      while(data1[0] <= i){
+        data1+=sizeof(int);
+      }
+
+      data1 -= j*(sizeof(int));
+      CALL_BF(BF_GetBlock(filedesc,data1[0], block));
+      data = BF_Block_GetData(block);
+      d = data + BF_BLOCK_SIZE - sizeof(int);
+    }
+    
+    memcpy(d, &dest, sizeof(int));
+    BF_Block_SetDirty(block);
+  }
 
   return HT_OK; 
 }
@@ -340,8 +397,8 @@ HT_ErrorCode CreateNewHashTable( int filedesc, Record record)
 
   //PREVIOUS
   int num_of_ints = BF_BLOCK_SIZE/sizeof(int);
-  num_block_hash_before = (a+1)/num_of_ints;
-  if((a+1)%num_of_ints > 0)
+  num_block_hash_before = a/num_of_ints;
+  if(a%num_of_ints > 0)
     num_block_hash_before++;
   // printf("other:  %d\n", num_block_hash_before);
 
@@ -354,8 +411,8 @@ HT_ErrorCode CreateNewHashTable( int filedesc, Record record)
   int num_block_hash_new;
   
   //AFTERRR
-  num_block_hash_new = (a+1)/num_of_ints;
-  if((a+1)%num_of_ints > 0)
+  num_block_hash_new = a/num_of_ints;
+  if(a%num_of_ints > 0)
     num_block_hash_new++;
 
   // printf("other:  %d\n", num_block_hash_new);
@@ -385,7 +442,9 @@ HT_ErrorCode CreateNewHashTable( int filedesc, Record record)
     //grafoume vathos proto
     //kai meta to kainourio hash table kai hasharoume se pio apo ta yparkta bucket deixnei
     //char* data = BF_Block_GetData( block) + sizeof(int);
-    data+=sizeof(int);
+    CALL_BF( BF_GetBlock(filedesc, 1, block));
+    data = BF_Block_GetData(block); 
+
     int prices[ previous_a];
     for( int i = 0; i < previous_a; i++)
     {
@@ -441,11 +500,14 @@ HT_ErrorCode CreateNewHashTable( int filedesc, Record record)
     //i = 3 
     //τωρα πρεπει να επεκτεινουμε το hashtable
 
+    CALL_BF( BF_GetBlock(filedesc, 0, block));
     data = BF_Block_GetData(block);
     int new_depth = depth;
     memcpy(data, &new_depth, sizeof(int));
     BF_Block_SetDirty(block);
-    data += sizeof(int);
+
+    CALL_BF( BF_GetBlock(filedesc, 1, block));
+    data = BF_Block_GetData(block);
     num_of_ints = 0;
     
     while (num_of_ints < a)       
@@ -520,21 +582,27 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
 
   //paikse me bathosssssssssssssssssssssssssssss 7...............
   int* d;
-  int num_block_hash = 2;
+  int num_block_hash = 3;
   HashNum++; //128
+
+  i++;
+  CALL_BF(BF_GetBlock(filedesc, i, block));
+  data = BF_Block_GetData( block);
+  
   while( data+ HashNum*sizeof(int) > data+BF_BLOCK_SIZE-1 )
   {
     i++;
     CALL_BF(BF_GetBlock(filedesc, i, block));
     data = BF_Block_GetData( block);
-    if( i == 1)
-    {
-      HashNum = HashNum - 127;
-    }
-    else
-    {
-      HashNum = HashNum - 128;
-    }
+    // if( i == 1)
+    // {
+    //   HashNum = HashNum - 127;
+    // }
+    // else
+    // {
+    //   HashNum = HashNum - 128;
+    // }
+    HashNum-=128;
     num_block_hash++;
 
   }
@@ -546,10 +614,10 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
   BF_GetBlockCounter( filedesc, &num_blocks);
   BF_GetBlock( filedesc, num_block_hash + bucket -1 , block);
   data = BF_Block_GetData( block);
-  d = data + sizeof(int);
+  d = data;
   int k = 0;
 
-  while( k < (BF_BLOCK_SIZE-sizeof(int))/sizeof(record))
+  while( k < (BF_BLOCK_SIZE - sizeof(int))/sizeof(record))
   {
       d = data + k*sizeof(record) + sizeof(int);
       char* nam1 = d[0];
@@ -617,7 +685,7 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
     }
     else
     {
-      CreateNewBucket( filedesc, record);
+      CreateNewBucket( filedesc, record, bucket);
     }
     return HT_ERROR;
   
