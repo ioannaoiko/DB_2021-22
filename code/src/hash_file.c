@@ -105,6 +105,17 @@ HT_ErrorCode HT_CreateIndex(const char *filename, int depth) {
   CALL_BF( BF_CreateFile(filename));
   CALL_BF( BF_OpenFile( filename, &file_desc));
 
+  //φτιαχνω ενα μπλοκ και βαζω μεσα το βαθος
+  BF_Block *block;
+  BF_Block_Init(&block);
+
+  CALL_BF( BF_AllocateBlock( file_desc, block));
+  char* data;
+
+  data = BF_Block_GetData(block);
+  memcpy(data, &depth, sizeof(int));
+  BF_Block_SetDirty(block);
+
   // printf("elaa create %s -- %d\n", filename, file_desc);
   //number of pointers in a block
   int num = BF_BLOCK_SIZE/sizeof(int);
@@ -119,21 +130,13 @@ HT_ErrorCode HT_CreateIndex(const char *filename, int depth) {
     num_of_blocks++;
   }
 
-  //φτιαχνω ενα μπλοκ και βαζω μεσα το βαθος
-  BF_Block *block;
-  BF_Block_Init(&block);
-
   CALL_BF( BF_AllocateBlock( file_desc, block));
   char* data;
-
-  data = BF_Block_GetData(block);
-  memcpy(data, &depth, sizeof(int));
-  BF_Block_SetDirty(block);
  
   //Πρεπει να το ξαναδω αν σε ενοχλεί βάλτο σε σχόλια μην το σβήσεις.
   int i = 0;
   int num_of_ints = 0;
-  data = BF_Block_GetData(block) + sizeof(int); //pairno to data
+  data = BF_Block_GetData(block); //pairno to data
 
   //FOR HASH-TABLE
   while (num_of_ints < a)        //ελεγχουμε αν χωραει στο ιδιο μπλοκ το αρχικο μας hash-table
@@ -291,7 +294,16 @@ int HashFunction( Record record, int depth)
 
 HT_ErrorCode CreateNewBucket( int filedesc, Record record)
 {
- return HT_OK; 
+  BF_Block* block;
+  BF_Block_Init(&block);
+
+  CALL_BF(BF_GetBlock(filedesc, 0, block));
+  BF_AllocateBlock(filedesc, block);
+
+  int blocks_num;
+  BF_GetBlockCounter( filedesc, &blocks_num);
+
+  return HT_OK; 
 }
 
 HT_ErrorCode CreateNewHashTable( int filedesc, Record record)
