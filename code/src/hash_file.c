@@ -415,9 +415,10 @@ HT_ErrorCode CreateNewBucket( int filedesc, Record record, int bucket){
 
         d1 = data1 + sizeof(int);
         block_info = d1[0];
+
         CALL_BF(BF_GetBlock(filedesc, block_info, block));
-        data1 = BF_Block_GetData(block) + sizeof(int);
-        num_info = -1;
+        data1 = BF_Block_GetData(block);
+        num_info = 0;
         d1 = data1;
       }
       num_info++;
@@ -498,8 +499,8 @@ HT_ErrorCode CreateNewBucket( int filedesc, Record record, int bucket){
         d1 = data1 + sizeof(int);
         block_info = d1[0];
         CALL_BF(BF_GetBlock(filedesc, block_info, block));
-        data1 = BF_Block_GetData(block) + sizeof(int);
-        num_info = -1;
+        data1 = BF_Block_GetData(block);
+        num_info = 0;
         d1 = data1;
       }
       num_info++;
@@ -794,27 +795,24 @@ HT_ErrorCode CreateNewHashTable( int filedesc, Record record, int bucket_b)
   BF_GetBlockCounter( filedesc, &blocks_num);
   if(blocks_num <  3)  { return HT_ERROR;}
   
+  //παιρνω απο το μπλοκ - πληροφοριων
   CALL_BF( BF_GetBlock(filedesc, 0, block));
 
   char* data;
   data = BF_Block_GetData(block);
 
+  //παιρνω το global_depth
   int depth = data[0];
-  // depth = 6;
-  printf("EXO dep: %d\n", depth);
+
+  //υπολογιζω το 2^depth
+  //που ειναι το μεγεθος του hashtable
   int a = 1;
   for( int i = 0; i < depth; i++)
   {
     a = a*2;
   }
-  //prepei na vro posa block eixa gia to hash table
-  //1o block ------- 127 theseis gia hash
-  //2o block ------- 128 theseis gia hash
-  //3o block ------- 128 theseis gia hash
-  //...
-  //...
-  //...
-  //N-osto block --- 128 theseis gia hash
+
+
   int num_block_hash_before;
 
   //PREVIOUS
@@ -822,14 +820,13 @@ HT_ErrorCode CreateNewHashTable( int filedesc, Record record, int bucket_b)
   num_block_hash_before = a/num_of_ints;
   if(a%num_of_ints > 0)
     num_block_hash_before++;
-  // printf("other:  %d\n", num_block_hash_before);
 
    
   //FOR NEW HASh
-  depth++;
-  int previous_a = a;
-  int previous_depth = depth - 1;
-  a = a*2;
+  depth++; //new depth
+  int previous_a = a; //previous 2^depth
+  int previous_depth = depth - 1; //previous depth
+  a = a*2;  //new 2^depth
   int num_block_hash_new;
   
   //AFTERRR
@@ -840,52 +837,41 @@ HT_ErrorCode CreateNewHashTable( int filedesc, Record record, int bucket_b)
   // printf("other:  %d\n", num_block_hash_new);
 
   int different = num_block_hash_new - num_block_hash_before;
-  int i = 0;
-  //edo tha isxyei mono oso to kainourio depth < 6 ti shmaieni ayto;
-  // ayto shmainei to 2^6 = 64 < 127 ---- ayto shmainei oti eimaste
-  //2^5 = 32 ---- posa block = 1
-  //2^6 = 64 ---- posa block = 1
-  //2^7 = 128 --- posa block = 2
-  //2^8 = 256 ---- posa block = 3
-  //2^9 = 512 ---- posa block = 5
+  int block_info = 0;
+  int block_hash = 1;
+
+  //if different == 0 than i have only one block( block_num = 1) for hash table
+  //this is when new_depth <= 7...2^depth = 128
   if(different == 0)
   {
 
-    int bucket = blocks_num - num_block_hash_new;
+    // int bucket = blocks_num - num_block_hash_new;
     //γραφω στην αρχη του 1ου μου μπλοκ
     //το νεο μας βαθος
-    
 
-
-    //diavazoume to hashtable
-    //apothikeoume se statiko pinaka se pio kado deixnei kath thesi
-    //unpin block
-    //sto idio block
-    //grafoume vathos proto
-    //kai meta to kainourio hash table kai hasharoume se pio apo ta yparkta bucket deixnei
-    //char* data = BF_Block_GetData( block) + sizeof(int);
-
-
-    CALL_BF( BF_GetBlock(filedesc, 1, block));
+    CALL_BF( BF_GetBlock(filedesc, block_hash, block));
     data = BF_Block_GetData(block); 
 
+    //διαβαζω τις προηγουμενες τιμες του hash table και
+    //τις αποθηκευω σε ενα πινακα
     int prices[ previous_a];
     for( int i = 0; i < previous_a; i++)
     {
       int* d = data + i*sizeof(int);
-      // printf("%d\n",d[0]);
       prices[i] = d[0];
     }      
  
     //τωρα πρεπει να επεκτεινουμε το hashtable
-
-    CALL_BF( BF_GetBlock(filedesc, 0, block));
+    CALL_BF( BF_GetBlock(filedesc, block_info, block));
     data = BF_Block_GetData(block);
+
+    //new depth write in the first block information in the start
     int new_depth = depth;
     memcpy(data, &new_depth, sizeof(int));
     BF_Block_SetDirty(block);
 
-    CALL_BF( BF_GetBlock(filedesc, 1, block));
+    //take first hash block
+    CALL_BF( BF_GetBlock(filedesc, block_hash, block));
     data = BF_Block_GetData(block);
     num_of_ints = 0;
     
@@ -893,26 +879,152 @@ HT_ErrorCode CreateNewHashTable( int filedesc, Record record, int bucket_b)
     {
       int value = num_of_ints >> 1;
       int v = prices[value];
-      printf("num_of_int = %d   value = %d\n",num_of_ints, v);
+      printf("Pos = %d   bucket = %d - CreateNewHashTable\n",num_of_ints, v);
       memcpy(data, &v, sizeof(int));
+
       BF_Block_SetDirty(block);
       num_of_ints++;
       data += sizeof(int);
     } 
 
   }
+  //gia depth >= 8
   else
   {
-    //eimaste sti periptosi poy depth >= 7
-    //2^7 = 128 --- posa block = 2
-    //2^8 = 256 ---- posa block = 3
-    //2^9 = 512 ---- posa block = 5
-    //2^10 = 1024 -- posa block =  8
+    //prepei na epekteino to eyretirio mou
+    //για να δημιουργησω αλλο ή αλλα hashblock
+
+    //2^8 + 1
+    //2^9 + 2
+    //2^10 + 4
+
+    //dhmioyrgo kapoia block gia arxi
+
+    //αρχικα διαβαζω τα στοιχεια του ή των προηγουμενων μπλοκ
+    block_hash = 1;
+    block_info = 0;
+    CALL_BF( BF_GetBlock(filedesc, block_hash, block));
+    data = BF_Block_GetData(block); 
+
+    //διαβαζω τις προηγουμενες τιμες του hash table και
+    //τις αποθηκευω σε ενα πινακα
+    int prices[ previous_a];
+    int elements = 0;
+    int num_from_info_to_hash = 1;
+    int Max_at_block = BF_BLOCK_SIZE/sizeof(int);
+    
+    for( int i = 0; i < previous_a; i++)
+    { 
+      if(Max_at_block == elements)
+      {
+
+        //παιρνω το μπλοκ-πληροφοριων
+        CALL_BF( BF_GetBlock( filedesc, block_info, block));
+        char* data1;
+        if(block_info == 0)
+        {
+          data1 = BF_Block_GetData( block) + num_from_info_to_hash*sizeof(int);
+        }
+        else
+        {
+          data1 = BF_Block_GetData( block) + sizeof(int) + num_from_info_to_hash*sizeof(int);
+        }
+
+        int* d1 = data1;
+
+        //an einai -1 tote -----> end   
+        if (d1[0] == -1)
+        {
+          return HT_ERROR;
+        }
+        //an einai -2 tote ------> vrisko NextInformationBlock
+        else if (d1[0] == -2)
+        {
+          //αν ειναι ισο με -2 σημαινει οτι ειναι το πρωτελευταιο στοιχειο του
+          //μπλοκ πληροφοριες και οτι το επομενο στοιχειο ειναι το μπλοκ που συνεχιζεται το μπλοκ
+          //πληροφοριων
+
+          d1 = data1 + sizeof(int);
+          block_info = d1[0];
+          CALL_BF(BF_GetBlock( filedesc, block_info, block));
+          
+          data = BF_Block_GetData( block);
+          num_from_info_to_hash = 0;
+          d1 = data[0];
+        }
+
+        num_from_info_to_hash++;
+        block_hash = d1[0];
+
+        CALL_BF( BF_GetBlock( filedesc, block_hash, block));
+        data = BF_Block_GetData( block);
+        elements = 0; //apo tin arxi tou hash
+        
+      }
+      int* d = data + elements*sizeof(int);
+      prices[i] = d[0];
+      elements++;
+    }      
 
 
-    //2^ 7 + 1 block hash
-    //na epanalavoume to pano gia to 1o 
-    //kai meta na grapsoyme sto 2o block to hash_table_ upoloipo
+
+    int new_blocks_num;
+    new_blocks_num = (a - previous_a)/( BF_BLOCK_SIZE/sizeof(int)); 
+    printf("new_blocks = %d - CreateNewHashTable\n", new_blocks_num);
+    //δεσμευω τα καινουριο new_blocks_num που χρειαζονται
+    //επισης τα αποθηκευω στο τελος του μπλοκ με της πληροφοριες
+    block_info = 0;
+    CALL_BF( BF_GetBlock( filedesc, block_info, block));
+    data = BF_Block_GetData( block) + sizeof( int); //because is the depth the first element
+    
+    int num = 0;
+    while(1)
+    {
+      int* d1 = data + num*sizeof(int);
+     
+      if( d1[0] == -1)
+      {
+        break;
+      }
+      else if( d1[0] == -2)
+      {
+        d1 = data + num*sizeof(int) + sizeof(int);
+        block_info = d1[0];
+        CALL_BF(BF_GetBlock( filedesc, block_info, block));
+          
+        data = BF_Block_GetData( block);
+        num = 0;
+        d1 = data[0];
+      }
+      num++;
+    }
+
+    //pairno ton arithmo twn yparxon blocks
+    int num_blocks;
+    CALL_BF( BF_GetBlockCounter( filedesc, &num_blocks));
+    
+    //kanoume allocate ta kainoyria block poy xreiazomaste gia to eyretiorio
+    for( int j = 0; j < new_blocks_num; j++)
+    {
+      CALL_BF( BF_AllocateBlock( filedesc, block));
+    }
+
+    //tora apothikeyo tou arithmous aytwn twn blocks sto block-informations
+    for( int j = 0; j < new_blocks_num; j++)
+    {
+
+      //opaaaa mhtso mn ksexnas stin arxi exeis to depth gia block info = 0
+      //elenkse to
+      if( num == 127)
+      {
+        //desmeyo kainoyrio block_info
+      }
+      else
+      {
+
+      }
+    }
+
 
   }
 
