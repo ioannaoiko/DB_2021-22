@@ -1414,3 +1414,26 @@ HT_ErrorCode HT_PrintAllEntries(int indexDesc, int *id) {
   //insert code here
   return HT_OK;
 }
+
+HT_ErrorCode HT_HashStatistics(char* filename){
+  int* indexDesc;
+  HT_OpenIndex(filename, indexDesc);
+
+  int* num_of_blocks;
+
+  int fileDesc = filetable->table[*indexDesc]->file_desc;
+  int count = BF_GetBlockCounter(fileDesc, num_of_blocks);
+
+  printf("Hash File named %s has %d blocks\n", filename, count);
+
+  BF_Block* block;
+  BF_Block_Init(&block);
+
+  int i = 1;
+  BF_GetBlock(fileDesc, i, block);
+  char* data = BF_Block_GetData(block);
+
+  
+
+  return HT_OK;
+}

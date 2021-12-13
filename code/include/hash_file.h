@@ -82,4 +82,7 @@ HT_ErrorCode HT_PrintAllEntries(
 	);
 
 
+HT_ErrorCode HT_HashStatistics(char* filename);
+
+
 #endif // HASH_FILE_H
