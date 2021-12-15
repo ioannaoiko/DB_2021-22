@@ -189,13 +189,7 @@ HT_ErrorCode HT_OpenIndex(const char *fileName, int *indexDesc){
   int filedesc;
   CALL_BF( BF_OpenFile(fileName, &filedesc));
 
-<<<<<<< HEAD
   for(int i = 0; i < 20; i++){
-=======
-  // printf("elaaaaaa  %s --- %d\n",fileName,filedesc);
-  // return HT_ERROR;
-  for(int i = 0; i < filetable->size_table; i++){
->>>>>>> 288623ade3824d13a063bc7719c69bfe608959ea
     if(filetable->table[i] == NULL){
       *indexDesc = i;
       break;
