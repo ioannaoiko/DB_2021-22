@@ -223,15 +223,10 @@ HT_ErrorCode HT_CloseFile(int indexDesc) {
   BF_Block* block;
   BF_Block_Init( &block);
   int blocks_num;
-  // CALL_BF( BF_GetBlockCounter( file_desc, &blocks_num));
+  CALL_BF( BF_GetBlockCounter( file_desc, &blocks_num));
 
-  // for( int i = 0; i < blocks_num; i++)
-  // {
-  //   CALL_BF( BF_GetBlock(file_desc, i, block));
-  //   CALL_BF( BF_UnpinBlock( block));
-  // }
 
-  printf("STIN CLOSE %d\n", file_desc);
+  printf("DIMIOYRGISES  %d BLOCKS\n", blocks_num);
   BF_CloseFile(file_desc);
   BF_Block_Destroy( &block);
 
@@ -271,7 +266,7 @@ int HashFunction( Record record, int depth)
 //EXOUME BUG
 HT_ErrorCode CreateNewBucket( int filedesc, Record record, int bucket){
 
-  printf("\neimai mesa me bucket = %d - CreateNewBucket\n", bucket);
+  // printf("\neimai mesa me bucket = %d - CreateNewBucket\n", bucket);
 
 
   //init for block
@@ -291,10 +286,11 @@ HT_ErrorCode CreateNewBucket( int filedesc, Record record, int bucket){
   // //take all blocks_num
   int blocks_num;
   CALL_BF( BF_GetBlockCounter( filedesc, &blocks_num));
-  printf(" all_blocks = %d for depth = %d\n\n\n", blocks_num, global_depth);
-  
+  // printf("All_blocks = %d for depth = %d\n\n\n", blocks_num, global_depth);
+
   //take num for the last block where is the new block
   int dest = blocks_num;
+  // printf("dest = %d and buck_old = %d\n", dest, bucket);
 
   
   int previous_block = -1;
@@ -329,6 +325,7 @@ HT_ErrorCode CreateNewBucket( int filedesc, Record record, int bucket){
     {
       if( first_find == false)
       {
+
         first_data = d;
         first_f = f;
         first_find = true;
@@ -428,7 +425,7 @@ HT_ErrorCode CreateNewBucket( int filedesc, Record record, int bucket){
   // printf("3ol %d\n", first_hashtable_num);
 
   CALL_BF( BF_UnpinBlock( block));
-  printf("i am here with %d -- %d\n", first_hashtable_num, num);
+  // printf("i am here with %d -- %d\n", first_hashtable_num, num);
   
   CALL_BF( BF_GetBlock(filedesc, first_hashtable_num, block));  //pairno to block poy ksekina na deixnei sto bucket provlima
   data = BF_Block_GetData( block);                //pairno tin dieythisni tis protis thesis tou eyretirioy atri
@@ -508,7 +505,7 @@ HT_ErrorCode CreateNewBucket( int filedesc, Record record, int bucket){
   //ara exo dyo block
   int old_bucket = bucket;
   int new_bucket = dest;
-
+  // printf("old_bucket %d", old_bucket);
   // ena bucket xoraei to poli 8 eggrafes eipame
   // diavazp tis times aytes kai tis apothikeyo se ena pinaka pao record
   
@@ -521,7 +518,7 @@ HT_ErrorCode CreateNewBucket( int filedesc, Record record, int bucket){
   int* num_depth = data;
   int topic_depth;
   topic_depth = num_depth[0] + 1;
-  printf("next t_d = %d && prev = %d\n\n", topic_depth, data[0]);
+  // printf("next t_d = %d && prev = %d\n\n", topic_depth, data[0]);
   memcpy( data, &topic_depth, sizeof(int));
   BF_Block_SetDirty( block);
   CALL_BF( BF_UnpinBlock( block));
@@ -532,7 +529,8 @@ HT_ErrorCode CreateNewBucket( int filedesc, Record record, int bucket){
   //////////////////////////////////////////////////////////////////////////////////////////
   BF_PrintError(BF_AllocateBlock( filedesc, block));
   /////////////////////////////////////////////////////////////////////////////////////////
-  printf("wdo eimai   %d\n", new_bucket);
+  CALL_BF( BF_GetBlockCounter( filedesc, &blocks_num));
+  // printf(" All_blocks = %d after Create kai new = %d\n\n", blocks_num, new_bucket);
   // CALL_BF( BF_UnpinBlock( block));
   // CALL_BF( BF_GetBlock(filedesc, new_bucket, block));
   data = BF_Block_GetData( block);
@@ -597,7 +595,9 @@ HT_ErrorCode CreateNewBucket( int filedesc, Record record, int bucket){
     BF_Block_SetDirty( block);
     j++;  
   }
+  
 
+  // printf("to palio %d\n",old_bucket);
   //gia tis palies eggrafes
   Record record_old;
 
@@ -619,14 +619,14 @@ HT_ErrorCode CreateNewBucket( int filedesc, Record record, int bucket){
 
     block_info = 0;
     int block_hash = 1;
-    int num_from_info_to_hash = 0;
+    int num_from_info_to_hash = 2;
     CALL_BF( BF_UnpinBlock( block));    // to old bucket
     CALL_BF(BF_GetBlock(filedesc, block_hash, block)); 
     data = BF_Block_GetData( block);
 
 
 
-  
+    int* d1;
   
     while( data+ HashNum*sizeof(int) > data+BF_BLOCK_SIZE-1 )
     {
@@ -637,16 +637,10 @@ HT_ErrorCode CreateNewBucket( int filedesc, Record record, int bucket){
       CALL_BF( BF_UnpinBlock( block));
       CALL_BF( BF_GetBlock( filedesc, block_info, block));
       char* data1;
-      if(block_info == 0)
-      {
-        data1 = BF_Block_GetData( block) + sizeof(int)+ num_from_info_to_hash*sizeof(int);
-      }
-      else
-      {
-        data1 = BF_Block_GetData( block) + num_from_info_to_hash*sizeof(int);
-      }
+    
+      data1 = BF_Block_GetData( block) + num_from_info_to_hash*sizeof(int);
 
-      int* d1 = data1;
+      d1 = data1;
 
       //an einai -1 tote -----> end   
       if (d1[0] == -1)
@@ -662,20 +656,20 @@ HT_ErrorCode CreateNewBucket( int filedesc, Record record, int bucket){
         //αν ειναι ισο με -2 σημαινει οτι ειναι το πρωτελευταιο στοιχειο του
         //μπλοκ πληροφοριες και οτι το επομενο στοιχειο ειναι το μπλοκ που συνεχιζεται το μπλοκ
         //πληροφοριων
+        num_from_info_to_hash++;
+        d1 = BF_Block_GetData( block) + num_from_info_to_hash*sizeof(int);
 
-        d1 = data1 + sizeof(int);
         block_info = d1[0];
         CALL_BF( BF_UnpinBlock( block));
         CALL_BF(BF_GetBlock( filedesc, block_info, block));
         
         data = BF_Block_GetData( block);
         num_from_info_to_hash = 0;
-        d1 = data[0];
+        d1 = data;
       }
 
       num_from_info_to_hash++;
       block_hash = d1[0];
-      ///////////////////
       
       CALL_BF( BF_UnpinBlock( block));
       CALL_BF(BF_GetBlock(filedesc, block_hash, block));
@@ -684,9 +678,11 @@ HT_ErrorCode CreateNewBucket( int filedesc, Record record, int bucket){
       HashNum-=128;
     }
 
+    // printf("Hashum : %d block_hash = %d\n", HashNum, block_hash);
+
     int* d = data + HashNum*sizeof(int);
     int bucket_from_hash = d[0];
-    printf("ookkkk %d\n", bucket_from_hash);
+    // printf("Hasharo sto b = %d\n", bucket_from_hash);
 
     CALL_BF( BF_UnpinBlock( block));
     CALL_BF( BF_GetBlock( filedesc, bucket_from_hash, block));
@@ -719,6 +715,7 @@ HT_ErrorCode CreateNewBucket( int filedesc, Record record, int bucket){
       //surname
       memcpy( data + num_old*sizeof(record) + sizeof(int) + sizeof(name) + sizeof(surname), city, sizeof(city));
       BF_Block_SetDirty(block);
+      // CALL_BF( BF_UnpinBlock( block));
 
       num_old++;
     }
@@ -740,14 +737,16 @@ HT_ErrorCode CreateNewBucket( int filedesc, Record record, int bucket){
       //surname
       memcpy( data + num_new*sizeof(record) + sizeof(int) + sizeof(name) + sizeof(surname), city, sizeof(city));
       BF_Block_SetDirty(block);
+      // CALL_BF( BF_UnpinBlock( block));
 
       num_new++;
     }
-  }
-  
+
+  }  
   CALL_BF( BF_UnpinBlock( block));
+
   BF_Block_Destroy( &block);
-  printf("o[a\n");
+  // printf("o[a\n");
   return HT_OK; 
 }
 
@@ -935,7 +934,7 @@ HT_ErrorCode CreateNewHashTable( int filedesc, Record record, int bucket_b)
           
           data = BF_Block_GetData( block);
           num_from_info_to_hash = 0;
-          d1 = data[0];
+          d1 = data;
         }
 
         num_from_info_to_hash++;
@@ -985,7 +984,7 @@ HT_ErrorCode CreateNewHashTable( int filedesc, Record record, int bucket_b)
           
         data = BF_Block_GetData( block);
         num = 0;
-        d1 = data[0];
+        d1 = data;
       }
       num++;
     }
@@ -1040,7 +1039,10 @@ HT_ErrorCode CreateNewHashTable( int filedesc, Record record, int bucket_b)
       //shmainei oti to block_info exei kai epomeno block_info opote sti teleytaia thesi tou torinou block
       //meta to -2 yparxei h timi toy epomenoy block_info
       if( num == BF_BLOCK_SIZE/sizeof(int) -1)
-      {
+      { 
+        printf("num einai %d\n", num);
+        // return HT_ERROR;
+        
 
         int* d_1 = data + (num-1)*sizeof(int);
         int new_hash_to_transfer = d_1[0];
@@ -1061,7 +1063,8 @@ HT_ErrorCode CreateNewHashTable( int filedesc, Record record, int bucket_b)
         CALL_BF( BF_UnpinBlock( block));  //itan slash
         CALL_BF( BF_GetBlock( filedesc, block_info, block));
         data = BF_Block_GetData( block);
-
+        printf("new info = %d\n", new_block_info);
+        // exit( EXIT_FAILURE);
         //kai apothikeyo poio einai to kainoyrio block pliroforiwn
         memcpy( data + num*sizeof(int), &new_block_info, sizeof(int));
         BF_Block_SetDirty( block);
@@ -1259,7 +1262,7 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
   data = BF_Block_GetData( block);
 
 
-  printf("hasharei %d - insert\n", HashNum);
+  // printf("hasharei %d - insert\n", HashNum);
   
   
   //Αν η θεση του πινακα που χασαρουμε δεν ειναι στο 1ο μπλοκ ευρετηριου τοτε παμε στο
@@ -1309,7 +1312,7 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
 
     CALL_BF( BF_UnpinBlock( block));
     CALL_BF(BF_GetBlock(filedesc, i, block));
-    printf("I = %d\n",i);
+    // printf("I = %d\n",i);
     data = BF_Block_GetData( block);
     HashNum = HashNum - 128;
 
@@ -1321,7 +1324,7 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
   // printf("\n\necooo gia bucket %d - insert\n", d[0]);
   
   int bucket = d[0];
-  printf(" buck = %d kai d[0] = %d\n", bucket, d[0]);
+  // printf(" buck = %d kai d[0] = %d\n", bucket, d[0]);
 
   //παιρνουμε τον αριθμο των μπλοκς
   int num_blocks;
@@ -1390,7 +1393,7 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
       BF_Block_Destroy( &block);
       return HT_ERROR;
     }
-    printf("Global_d = %d kai Topic_d = %d - InsertEntry\n", depth, depth_bucket);
+    // printf("Global_d = %d kai Topic_d = %d - InsertEntry\n", depth, depth_bucket);
  
 
     if( depth == depth_bucket)
