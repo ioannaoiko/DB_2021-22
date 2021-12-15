@@ -76,7 +76,7 @@ int main() {
   srand(12569874);
   int r;
   printf("Insert Entries\n");
-  for (int id = 0; id < 1200/*RECORDS_NUM*/; ++id) {
+  for (int id = 0; id < 200000/*RECORDS_NUM*/; ++id) {
     // create a record
     record.id = id;
   
