@@ -111,11 +111,11 @@ HT_ErrorCode HT_CreateIndex(const char *filename, int depth) {
   int i = 0;
   int num_of_ints = 0;
   data = BF_Block_GetData(block); //pairno to data
-
+  int hash_block = 1;
   //FOR HASH-TABLE
   while (num_of_ints < a)        //ελεγχουμε αν χωραει στο ιδιο μπλοκ το αρχικο μας hash-table
   {
-    if(data+i*sizeof(int) > data+BF_BLOCK_SIZE-1)
+    if(data + i*sizeof(int) > data + BF_BLOCK_SIZE-1)
     { 
       CALL_BF( BF_UnpinBlock( block));
       CALL_BF( BF_AllocateBlock( file_desc, block));
@@ -168,7 +168,7 @@ HT_ErrorCode HT_OpenIndex(const char *fileName, int *indexDesc){
   int filedesc;
   CALL_BF( BF_OpenFile(fileName, &filedesc));
 
-  for(int i = 0; i < 20; i++){
+  for(int i = 0; i < MAX_OPEN_FILES; i++){
     if(filetable->table[i] == NULL){
       *indexDesc = i;
       break;
@@ -207,7 +207,6 @@ HT_ErrorCode HT_CloseFile(int indexDesc) {
   BF_Block_Init( &block);
   int blocks_num;
   CALL_BF( BF_GetBlockCounter( file_desc, &blocks_num));
-  printf("EFTIAKSES TOSA %d\n", blocks_num);
 
   BF_CloseFile(file_desc);
   BF_Block_Destroy( &block);
@@ -766,7 +765,6 @@ HT_ErrorCode CreateNewHashTable( int filedesc, Record record, int bucket_b)
   if(different == 0)
   {
 
-    // int bucket = blocks_num - num_block_hash_new;
     //γραφω στην αρχη του 1ου μου μπλοκ
     //το νεο μας βαθος
     
@@ -1155,17 +1153,16 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
   
   //global depth 
   int depth = data[0];
-  CALL_BF( BF_UnpinBlock( block));                                            //PALIA ITAN
+  CALL_BF( BF_UnpinBlock( block)); 
   //Hashing
   int HashNum = HashFunction( record, depth);
 
   int* d;
-  // int num_block_hash = 3;
 
   //το 2ο μπλοκ του αρχειου ειναι το 1ο μπλοκ του ευρετηριου
   i = 1;
   int num_info = 1;
-  int block_info = 0;                                                           //itan paliiia
+  int block_info = 0;
   CALL_BF(BF_GetBlock(filedesc, i, block));
   data = BF_Block_GetData( block);
   
@@ -1255,7 +1252,6 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
 
   //ξεχωριζω τα πεδια του record
   int id = record.id;
-  // printf("id = %d\n",id);
   char name[15];
   strcpy(name, record.name);
 
@@ -1277,7 +1273,6 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
     int depth_bucket = data[0];
     CALL_BF( BF_UnpinBlock( block)); 
 
-    ///checkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
     if( depth < depth_bucket)
     {
       printf("Global_d = %d kai Topic_d = %d - InsertEntry\n", depth, depth_bucket);
@@ -1357,10 +1352,9 @@ HT_ErrorCode HT_PrintAllEntries(int indexDesc, int *id) {
     int i = 1;
     int num_info = 1;
     int block_info = 0;
-    CALL_BF( BF_UnpinBlock( block));                                                              //itan paliiia
+    CALL_BF( BF_UnpinBlock( block)); 
     CALL_BF(BF_GetBlock(filedesc, i, block));
     char* data = BF_Block_GetData( block);
-    // printf("hasharei %d - insert\n", HashNum);
     //Αν η θεση του πινακα που χασαρουμε δεν ειναι στο 1ο μπλοκ ευρετηριου τοτε παμε στο
     //επομενο και ουτε καθεξης
 
@@ -1414,11 +1408,11 @@ HT_ErrorCode HT_PrintAllEntries(int indexDesc, int *id) {
       HashNum = HashNum - 128;
 
     }
-
     //παιρνουμε σε ποιο μπλοκ χασαρει τελικα
     char* d = data + HashNum*sizeof(int);
-
-    int bucket = d[0];
+    int* d1 = d;
+    
+    int bucket = d1[0];
 
     CALL_BF(BF_UnpinBlock(block));
     CALL_BF(BF_GetBlock(filedesc, bucket, block));
@@ -1429,9 +1423,10 @@ HT_ErrorCode HT_PrintAllEntries(int indexDesc, int *id) {
     char surname[20];
     char city[20];
     while( d < data + BF_BLOCK_SIZE - 1){
-      if(d[0] == *id){
+      d1 = d;
+      if(d1[0] == *id){
         
-        printf("Id : %d\n", d[0]);
+        printf("Id : %d\n", d1[0]);
         char* data1 = d + sizeof(int);
 
         strcpy(name, data1);
@@ -1595,12 +1590,10 @@ HT_ErrorCode HT_PrintAllEntries(int indexDesc, int *id) {
 // HT_OK, ενώ σε διαφορετική περίπτωση κάποιος κωδικός λάθους.
 HT_ErrorCode HT_HashStatistics(char* filename){
   int filedesc;
-  // HT_OpenIndex(filename, indexDesc);
   CALL_BF(BF_OpenFile(filename, &filedesc));
 
   int num_of_blocks;
 
-  // int filedesc = filetable->table[*indexDesc]->file_desc;
   BF_GetBlockCounter(filedesc, &num_of_blocks);
 
   printf("Hash File named %s has %d blocks\n", filename,num_of_blocks);
@@ -1714,7 +1707,7 @@ HT_ErrorCode HT_HashStatistics(char* filename){
       }
       else if (d1[0] == -2)
       {
-        //αν ειναι ισο με -2 σημαινει οτι ειναι το πρωτελευταιο στοιχειο του
+        //αν ειναι ισο με -2 σημαινει οτι ειναι το προτελευταιο στοιχειο του
         //μπλοκ πληροφοριες και οτι το επομενο στοιχειο ειναι το μπλοκ που συνεχιζεται το μπλοκ
         //πληροφοριων
         d1 = data1 + sizeof(int);

@@ -76,7 +76,7 @@ int main() {
   srand(12569874);
   int r;
   printf("Insert Entries\n");
-  for (int id = 0; id < 100000; ++id) {
+  for (int id = 0; id < RECORDS_NUM; ++id) {
     // create a record
     
     record.id = id;
@@ -91,13 +91,11 @@ int main() {
     CALL_OR_DIE(HT_InsertEntry(indexDesc, record));
   }
 
-  // printf("RUN PrintAllEntries\n");
-  // int id = rand() % RECORDS_NUM;
-  // int id = 10;
-  // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &id));
-  // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
-  // CALL_OR_DIE(HT_CloseFile(index));
-  CALL_OR_DIE( HT_HashStatistics( FILE_NAME));
+  printf("RUN PrintAllEntries\n");
+  int id = rand() % RECORDS_NUM;
+  CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &id));
+  CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
+  
 
   CALL_OR_DIE(HT_CloseFile(indexDesc));
   BF_Close();
