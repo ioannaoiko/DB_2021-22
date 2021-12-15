@@ -76,7 +76,7 @@ int main() {
   srand(12569874);
   int r;
   printf("Insert Entries\n");
-  for (int id = 0; id < 1200/*RECORDS_NUM*/; ++id) {
+  for (int id = 0; id < 50/*RECORDS_NUM*/; ++id) {
     // create a record
     record.id = id;
   
@@ -93,7 +93,8 @@ int main() {
 
   // printf("RUN PrintAllEntries\n");
   // int id = rand() % RECORDS_NUM;
-  // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &id));
+  int id = 10;
+  CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &id));
   // //CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
 
 
