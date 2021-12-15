@@ -1,4 +1,6 @@
 make all --print-data-base --no-builtin-variables --no-builtin-rules --question
+make: *** No rule to make target 'all'.  Stop.
+ 
 # GNU Make 4.2.1
 # Built for x86_64-pc-linux-gnu
 # Copyright (C) 1988-2016 Free Software Foundation, Inc.
@@ -6,7 +8,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Wed Dec 15 11:20:13 2021
+# Make data base, printed on Wed Dec 15 15:27:35 2021
 
 # Variables
 
@@ -45,11 +47,11 @@ CURDIR := /home/ioanna/DB_2021-22
 # makefile
 SHELL = /bin/sh
 # environment
-SNAP_DATA = /var/snap/code/83
+SNAP_DATA = /var/snap/code/84
 # environment
 VSCODE_NLS_CONFIG = {"locale":"en-us","availableLanguages":{},"_languagePackSupport":true}
 # environment
-JOURNAL_STREAM = 8:47454
+JOURNAL_STREAM = 8:48633
 # environment
 XDG_CONFIG_DIRS = /etc/xdg/xdg-ubuntu:/etc/xdg
 # environment
@@ -73,9 +75,9 @@ DBUS_SESSION_BUS_ADDRESS = unix:path=/run/user/1000/bus
 # environment
 VSCODE_VERBOSE_LOGGING = true
 # environment
-_ = /snap/code/83/usr/share/code/code
+_ = /snap/code/84/usr/share/code/code
 # environment
-MANAGERPID = 1481
+MANAGERPID = 1409
 # environment
 LESSOPEN = | /usr/bin/lesspipe %s
 # environment
@@ -83,7 +85,7 @@ LC_NAME = el_GR.UTF-8
 # environment
 VSCODE_CWD = /home/ioanna
 # environment
-GSETTINGS_SCHEMA_DIR = /snap/code/83/usr/share/glib-2.0/schemas
+GSETTINGS_SCHEMA_DIR = /snap/code/84/usr/share/glib-2.0/schemas
 # default
 MAKE_HOST := x86_64-pc-linux-gnu
 # environment
@@ -91,15 +93,15 @@ PATH = /home/ioanna/anaconda3/bin:/home/ioanna/anaconda3/condabin:/usr/local/sbi
 # environment
 GPG_AGENT_INFO = /run/user/1000/gnupg/S.gpg-agent:0:1
 # environment
-SESSION_MANAGER = local/ioanna-Inspiron-5490:@/tmp/.ICE-unix/1722,unix/ioanna-Inspiron-5490:/tmp/.ICE-unix/1722
+SESSION_MANAGER = local/ioanna-Inspiron-5490:@/tmp/.ICE-unix/1645,unix/ioanna-Inspiron-5490:/tmp/.ICE-unix/1645
 # environment
 XDG_RUNTIME_DIR = /run/user/1000
 # environment
 GDK_PIXBUF_MODULE_FILE = /home/ioanna/snap/code/common/.cache/gdk-pixbuf-loaders.cache
 # environment
-SNAP = /snap/code/83
+SNAP = /snap/code/84
 # environment
-SNAP_VERSION = 7db1a2b8
+SNAP_VERSION = fe719cd3
 # environment
 CONDA_PREFIX = /home/ioanna/anaconda3
 # environment
@@ -111,9 +113,9 @@ DISABLE_WAYLAND = 1
 # environment
 VSCODE_CRASH_REPORTER_START_OPTIONS = {"companyName":"Microsoft","productName":"VSCode","submitURL":"appcenter://code?aid=fba07a4d-84bd-4fc8-a125-9640fc8ce171&uid=d47e8f72-09d7-4195-9c60-fdbcf821d31e&iid=d47e8f72-09d7-4195-9c60-fdbcf821d31e&sid=d47e8f72-09d7-4195-9c60-fdbcf821d31e","uploadToServer":true}
 # environment
-INVOCATION_ID = 125c75d003404c5aa1de5f5b326eb9d3
+INVOCATION_ID = 03fe6abc8fd44bc6979c7dc57415569e
 # environment
-GDK_PIXBUF_MODULEDIR = /snap/code/83/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders
+GDK_PIXBUF_MODULEDIR = /snap/code/84/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders
 # default
 .FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell archives jobserver output-sync check-symlink load
 # environment
@@ -123,7 +125,7 @@ XDG_SESSION_DESKTOP = ubuntu
 # environment
 SSH_AUTH_SOCK = /run/user/1000/keyring/ssh
 # environment
-GIO_LAUNCHED_DESKTOP_FILE_PID = 2212
+GIO_LAUNCHED_DESKTOP_FILE_PID = 3146
 # automatic
 %F = $(notdir $%)
 # environment
@@ -139,7 +141,7 @@ PWD = /home/ioanna/DB_2021-22
 # default
 .LOADED := 
 # environment
-SSH_AGENT_PID = 1680
+SSH_AGENT_PID = 1601
 # environment
 ORIGINAL_XDG_CURRENT_DESKTOP = ubuntu:GNOME
 # environment
@@ -153,7 +155,7 @@ LESSCLOSE = /usr/bin/lesspipe %s %s
 # environment
 VSCODE_CLI = 1
 # environment
-VSCODE_CODE_CACHE_PATH = /home/ioanna/.config/Code/CachedData/7db1a2b88f7557e0a43fec75b6ba7e50b3e9f77e
+VSCODE_CODE_CACHE_PATH = /home/ioanna/.config/Code/CachedData/fe719cd3e5825bf14e14182fddeb88ee8daf044f
 # environment
 LOGNAME = ioanna
 # environment
@@ -189,19 +191,19 @@ MAKECMDGOALS := all
 # environment
 QT_IM_MODULE = ibus
 # environment
-SNAP_USER_DATA = /home/ioanna/snap/code/83
+SNAP_USER_DATA = /home/ioanna/snap/code/84
 # environment
 SHLVL = 0
 # environment
 GNOME_SHELL_SESSION_MODE = ubuntu
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-92d6c0ff-56ab-4186-b61f-18aa6c5134ca.sock
+VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-5323f134-f409-4712-b048-d916d1f53d2b.sock
 # default
 MAKE_VERSION := 4.2.1
 # environment
 USER = ioanna
 # environment
-SNAP_REVISION = 83
+SNAP_REVISION = 84
 # environment
 LC_MONETARY = el_GR.UTF-8
 # makefile
@@ -221,7 +223,7 @@ MAKE_COMMAND := make
 # automatic
 *F = $(notdir $*)
 # environment
-VSCODE_IPC_HOOK = /run/user/1000/vscode-3e0873f4-1.63.0-main.sock
+VSCODE_IPC_HOOK = /run/user/1000/vscode-3e0873f4-1.63.1-main.sock
 # environment
 BAMF_DESKTOP_FILE_HINT = /var/lib/snapd/desktop/applications/code_code.desktop
 # makefile
@@ -285,10 +287,11 @@ LC_ADDRESS = el_GR.UTF-8
 # environment
 LANG = C
 # environment
-VSCODE_PID = 2257
+VSCODE_PID = 3192
 # environment
 _CE_CONDA = 
 # variable set hash-table stats:
+ 
 # Load=139/1024=14%, Rehash=0, Collisions=25/161=16%
 
 # Pattern-specific Variable Values
@@ -297,9 +300,6 @@ _CE_CONDA =
 
 # Directories
 
- 
-make: *** No rule to make target 'all'.  Stop.
- 
 # . (device 66311, inode 2492497): 11 files, no impossibilities.
 
 # 11 files, no impossibilities in 1 directories.
@@ -358,6 +358,6 @@ GNUmakefile:
 # strcache performance: lookups = 22 / hit rate = 13%
 # hash-table stats:
 # Load=19/8192=0%, Rehash=0, Collisions=1/22=5%
-# Finished Make data base on Wed Dec 15 11:20:13 2021
+# Finished Make data base on Wed Dec 15 15:27:35 2021
 
  

@@ -195,7 +195,6 @@ HT_ErrorCode HT_OpenIndex(const char *fileName, int *indexDesc){
       break;
     }
   }
-  printf("indexdesc = %d\n", *indexDesc);
 
   // printf(" ind: %d\n",filetable->table[*indexDesc]->filename);  
   filetable->table[*indexDesc] = malloc(sizeof(struct file_open));
@@ -1440,101 +1439,110 @@ HT_ErrorCode HT_PrintAllEntries(int indexDesc, int *id) {
   char* data1 = BF_Block_GetData(block);
   int depth = data1[0];
 
-  Record record;
-  record.id = *id;
+  id(id != NULL){
 
-  int HashNum = HashFunction( record, depth);
-  int i = 1;
-  int num_info = 1;
-  int block_info = 0;
-  CALL_BF( BF_UnpinBlock( block));                                                              //itan paliiia
-  CALL_BF(BF_GetBlock(filedesc, i, block));
-  char* data = BF_Block_GetData( block);
-// printf("hasharei %d - insert\n", HashNum);
-  //Αν η θεση του πινακα που χασαρουμε δεν ειναι στο 1ο μπλοκ ευρετηριου τοτε παμε στο
-  //επομενο και ουτε καθεξης
-  while( data+ HashNum*sizeof(int) > data+BF_BLOCK_SIZE-1 )
-  { 
-    printf("elllaaaa %d\n",i);
-    CALL_BF( BF_UnpinBlock( block));
-    //αρα διαβαζουμε απο το μπλοκ πληροφοριες ποιο ειναι το επομενο
-    CALL_BF( BF_GetBlock( filedesc, block_info, block));
-    
-    char *data1;
-    //παιρνουμε τον αριθμο του επομενου μπλοκ ευρετηριου
-    if( block_info == 0)
-    {
-      data1 = BF_Block_GetData(block) + sizeof(int) + num_info*sizeof(int);
-    }
-    else
-    {
-      //epeidi to proto stoixeio einai kapoio hash block kai oxi to vathos
-      data1 = BF_Block_GetData(block)  + num_info*sizeof(int);
-    }
-    int* d1 = data1;
-    
-    //αν ειναι -1 ειναι το τελος και εχουμε ερρορ
-    if ( d1[0] == -1)
-    {
-      //////////////////////////////////////////FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF DEITTTTTTEEEE TOOOO
-      return HT_ERROR;
-    }
-    else if( d1[0] == -2)
-    {
-      //αν ειναι ισο με -2 σημαινει οτι ειναι το πρωτελευταιο στοιχειο του
-      //μπλοκ πληροφοριες και οτι το επομενο στοιχειο ειναι το μπλοκ που συνεχιζεται το μπλοκ
-      //πληροφοριων
+    Record record;
+    record.id = *id;
 
-      d1 = data1 + sizeof(int);
-      block_info = d1[0];
-      CALL_BF( BF_UnpinBlock( block));
-      CALL_BF( BF_GetBlock( filedesc, block_info, block));
-      data1 = BF_Block_GetData( block) + sizeof(int);
-      num_info = 0;
-      d1 = data1;
-    }
-    num_info++;
-    i = d1[0];
-
-    CALL_BF( BF_UnpinBlock( block));
+    int HashNum = HashFunction( record, depth);
+    int i = 1;
+    int num_info = 1;
+    int block_info = 0;
+    CALL_BF( BF_UnpinBlock( block));                                                              //itan paliiia
     CALL_BF(BF_GetBlock(filedesc, i, block));
-    data = BF_Block_GetData( block);
-    HashNum = HashNum - 128;
-
-  }
-
-  //παιρνουμε σε ποιο μπλοκ χασαρει τελικα
-  int* d = data + HashNum*sizeof(int);
-
-  data = d;
-
-  d = data + sizeof(int);
-  char name[15];
-  char surname[20];
-  char city[20];
-  while( d < data + BF_BLOCK_SIZE - 1){
-    printf("here \n");
-    if(d[0] == *id){
+    char* data = BF_Block_GetData( block);
+    // printf("hasharei %d - insert\n", HashNum);
+    //Αν η θεση του πινακα που χασαρουμε δεν ειναι στο 1ο μπλοκ ευρετηριου τοτε παμε στο
+    //επομενο και ουτε καθεξης
+    while( data+ HashNum*sizeof(int) > data+BF_BLOCK_SIZE-1 )
+    { 
+      printf("elllaaaa %d\n",i);
+      CALL_BF( BF_UnpinBlock( block));
+      //αρα διαβαζουμε απο το μπλοκ πληροφοριες ποιο ειναι το επομενο
+      CALL_BF( BF_GetBlock( filedesc, block_info, block));
       
-      printf("Id : %d\n", d[0]);
-      char* data1 = d + sizeof(int);
+      char *data1;
+      //παιρνουμε τον αριθμο του επομενου μπλοκ ευρετηριου
+      if( block_info == 0)
+      {
+        data1 = BF_Block_GetData(block) + sizeof(int) + num_info*sizeof(int);
+      }
+      else
+      {
+        //epeidi to proto stoixeio einai kapoio hash block kai oxi to vathos
+        data1 = BF_Block_GetData(block)  + num_info*sizeof(int);
+      }
+      int* d1 = data1;
       
-      strcpy(name, data1);
-      printf("Name: %s\n", name);
+      //αν ειναι -1 ειναι το τελος και εχουμε ερρορ
+      if ( d1[0] == -1)
+      {
+        //////////////////////////////////////////FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF DEITTTTTTEEEE TOOOO
+        return HT_ERROR;
+      }
+      else if( d1[0] == -2)
+      {
+        //αν ειναι ισο με -2 σημαινει οτι ειναι το πρωτελευταιο στοιχειο του
+        //μπλοκ πληροφοριες και οτι το επομενο στοιχειο ειναι το μπλοκ που συνεχιζεται το μπλοκ
+        //πληροφοριων
 
-      data1 = d + sizeof(int) + sizeof(name);
-      
-      strcpy(surname, data1);
-      printf("SurName:%s\n", surname);
+        d1 = data1 + sizeof(int);
+        block_info = d1[0];
+        CALL_BF( BF_UnpinBlock( block));
+        CALL_BF( BF_GetBlock( filedesc, block_info, block));
+        data1 = BF_Block_GetData( block) + sizeof(int);
+        num_info = 0;
+        d1 = data1;
+      }
+      num_info++;
+      i = d1[0];
 
-      data1 = d + sizeof(int) + sizeof(name) + sizeof(surname);
-      
-      strcpy(city, data1);
-      printf("City: %s\n", city);
+      CALL_BF( BF_UnpinBlock( block));
+      CALL_BF(BF_GetBlock(filedesc, i, block));
+      data = BF_Block_GetData( block);
+      HashNum = HashNum - 128;
+
     }
-    d = d + sizeof(int) + sizeof(name) + sizeof(surname) + sizeof(city);
+
+    //παιρνουμε σε ποιο μπλοκ χασαρει τελικα
+    char* d = data + HashNum*sizeof(int);
+
+    int bucket = d[0];
+
+    CALL_BF(BF_UnpinBlock(block));
+    CALL_BF(BF_GetBlock(filedesc, bucket, block));
+    data = BF_Block_GetData(block);
+    d = data + sizeof(int);
+
+    char name[15];
+    char surname[20];
+    char city[20];
+    while( d < data + BF_BLOCK_SIZE - 1){
+      if(d[0] == *id){
+        
+        printf("Id : %d\n", d[0]);
+        char* data1 = d + sizeof(int);
+
+        strcpy(name, data1);
+        printf("Name: %s\n", name);
+
+        data1 = d + sizeof(int) + sizeof(name);
+        
+        strcpy(surname, data1);
+        printf("SurName:%s\n", surname);
+
+        data1 = d + sizeof(int) + sizeof(name) + sizeof(surname);
+        
+        strcpy(city, data1);
+        printf("City: %s\n", city);
+      }
+      d = d + sizeof(Record);
+    }
   }
-  printf("d[0] == %d\n", d[0]);
+  
+  else{
+
+  }
 
 
   return HT_OK;
