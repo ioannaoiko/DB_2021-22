@@ -76,8 +76,9 @@ int main() {
   srand(12569874);
   int r;
   printf("Insert Entries\n");
-  for (int id = 0; id < 200000/*RECORDS_NUM*/; ++id) {
+  for (int id = 0; id < 100000; ++id) {
     // create a record
+    
     record.id = id;
   
     r = rand() % 12;
@@ -88,15 +89,15 @@ int main() {
     memcpy(record.city, cities[r], strlen(cities[r]) + 1);
 
     CALL_OR_DIE(HT_InsertEntry(indexDesc, record));
-    // break;
   }
 
   // printf("RUN PrintAllEntries\n");
   // int id = rand() % RECORDS_NUM;
   // int id = 10;
   // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &id));
-  // //CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
-
+  // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
+  // CALL_OR_DIE(HT_CloseFile(index));
+  CALL_OR_DIE( HT_HashStatistics( FILE_NAME));
 
   CALL_OR_DIE(HT_CloseFile(indexDesc));
   BF_Close();
