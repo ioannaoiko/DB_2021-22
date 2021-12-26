@@ -23,8 +23,8 @@ CFLAGS = -Wall -no-pie -fPIE -g -I$(INCLUDE)
 
 # Αρχεία .o
 INCL = $(INCLUDE)/bf.h $(INCLUDE)/hash_file.h $(INCLUDE)/sht_file.h
-OBJS = $(EXAMPLES)/ht_main.o $(SRC)/hash_file.o $(LIB)/libbf.so
-OBJS1 = $(EXAMPLES)/ht_main.o $(SRC)/hash_file.o
+OBJS = $(EXAMPLES)/ht_main.o $(SRC)/hash_file.o $(SRC)/sht_file.o $(LIB)/libbf.so
+OBJS1 = $(EXAMPLES)/ht_main.o $(SRC)/hash_file.o $(SRC)/sht_file.o
 
 
 # the executable program
