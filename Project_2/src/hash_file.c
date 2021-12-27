@@ -9,14 +9,14 @@
 #include "hash_file.h"
 #define MAX_OPEN_FILES 20
 
-#define CALL_BF(call)       \
-{                           \
-  BF_ErrorCode code = call; \
-  if (code != BF_OK) {         \
-    BF_PrintError(code);    \
-    return HT_ERROR;        \
-  }                         \
-}
+// #define CALL_BF(call)       \
+// {                           \
+//   BF_ErrorCode code = call; \
+//   if (code != BF_OK) {         \
+//     BF_PrintError(code);    \
+//     return HT_ERROR;        \
+//   }                         \
+// }
 
 
 struct file_open{
@@ -34,7 +34,6 @@ struct table_file {
 };
 
 typedef struct table_file* FileTable;
-
 
 //καθολικη μεταβλητη - για τις δομες μας
 FileTable filetable;
@@ -250,7 +249,7 @@ int HashFunction( Record record, int depth)
 //Κανουμε σπλιτ για καινουριο καδο
 //καθως ξαναχασαρουμε τα στοιχεια του παλιου καδου
 //και την νεα μας εγγραφη
-HT_ErrorCode CreateNewBucket( int filedesc, Record record, int bucket, TupleId tupleid, UpdateRecordArray* updaterecordarray)
+HT_ErrorCode CreateNewBucket( int filedesc, Record record, int bucket, TupleId* tupleid, UpdateRecordArray* updaterecordarray)
 {
 
 
@@ -553,7 +552,7 @@ HT_ErrorCode CreateNewBucket( int filedesc, Record record, int bucket, TupleId t
         break;
       }
 
-      change_table[k].block = old_bucket;
+      change_table[k].bucket = old_bucket;
       change_table[k].index = k;
 
       k++;
@@ -689,8 +688,8 @@ HT_ErrorCode CreateNewBucket( int filedesc, Record record, int bucket, TupleId t
 
       if( i == (BF_BLOCK_SIZE -sizeof(int))/sizeof(record))
       {
-        tupleid.block = bucket_from_hash;
-        tupleId.index = num_old;
+        tupleid->block = bucket_from_hash;
+        tupleid->index = num_old;
       }
       else
       {
@@ -699,12 +698,12 @@ HT_ErrorCode CreateNewBucket( int filedesc, Record record, int bucket, TupleId t
           strcpy( updaterecordarray[num_update].surname, surname);
           strcpy( updaterecordarray[num_update].city, city);
 
-          updaterecordarray[num_update].newTupleId.block = bucket_from_hash; 
+          updaterecordarray[num_update].newTupleId.block = old_bucket; 
           updaterecordarray[num_update].newTupleId.index = num_old;
           
           updaterecordarray[num_update].oldTupleId.block = change_table[i].bucket;
           updaterecordarray[num_update].oldTupleId.index = change_table[i].index;
-           
+          num_update++;
         }
       }
 
@@ -730,8 +729,8 @@ HT_ErrorCode CreateNewBucket( int filedesc, Record record, int bucket, TupleId t
 
       if( i == (BF_BLOCK_SIZE -sizeof(int))/sizeof(record))
       {
-        tupleid.block = bucket_from_hash;
-        tupleId.index = num_new;
+        tupleid->block = bucket_from_hash;
+        tupleid->index = num_new;
       }
       else
       {
@@ -740,12 +739,13 @@ HT_ErrorCode CreateNewBucket( int filedesc, Record record, int bucket, TupleId t
           strcpy( updaterecordarray[num_update].surname, surname);
           strcpy( updaterecordarray[num_update].city, city);
 
-          updaterecordarray[num_update].newTupleId.block = bucket_from_hash; 
+          updaterecordarray[num_update].newTupleId.block = new_bucket; 
           updaterecordarray[num_update].newTupleId.index = num_new;
           
           updaterecordarray[num_update].oldTupleId.block = change_table[i].bucket;
           updaterecordarray[num_update].oldTupleId.index = change_table[i].index;
-           
+          num_update++;
+          
         }
       }
 
@@ -760,7 +760,7 @@ HT_ErrorCode CreateNewBucket( int filedesc, Record record, int bucket, TupleId t
 }
 
 
-HT_ErrorCode CreateNewHashTable( int filedesc, Record record, int bucket_b, TupleId tupleid, UpdateRecordArray* updaterecordarray)
+HT_ErrorCode CreateNewHashTable( int filedesc, Record record, int bucket_b, TupleId* tupleid, UpdateRecordArray* updaterecordarray)
 { 
 
   BF_Block* block;
@@ -1188,7 +1188,7 @@ HT_ErrorCode CreateNewHashTable( int filedesc, Record record, int bucket_b, Tupl
  * Οι πληροφορίες που αφορούν το αρχείο βρίσκονται στον πίνακα ανοιχτών αρχείων, ενώ η εγγραφή προς εισαγωγή προσδιορίζεται από τη δομή record. 
  * Σε περίπτωση που εκτελεστεί επιτυχώς επιστρέφεται HT_OK, ενώ σε διαφορετική περίπτωση κάποιος κωδικός λάθους.
  */
-HT_ErrorCode HT_InsertEntry(int indexDesc, Record record, TupleId tupleId, UpdateRecordArray* updaterecordarray) {
+HT_ErrorCode HT_InsertEntry(int indexDesc, Record record, TupleId* tupleId, UpdateRecordArray* updaterecordarray) {
   //insert code here
 
   //παιρνω τον αριθμο αρχειου ωστε να το βρω
@@ -1379,8 +1379,8 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record, TupleId tupleId, Updat
     memcpy( data + k*sizeof(record) + sizeof(int) + sizeof(name) + sizeof(surname), city, sizeof(city));
     BF_Block_SetDirty(block);
 
-    tupleId.block = bucket;
-    tupleId.index = k;
+    tupleId->block = bucket;
+    tupleId->index = k;
 
     CALL_BF( BF_UnpinBlock( block));
 

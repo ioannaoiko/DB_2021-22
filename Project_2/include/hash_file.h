@@ -1,10 +1,23 @@
 #ifndef HASH_FILE_H
 #define HASH_FILE_H
 
+#define CALL_BF(call)       \
+{                           \
+  BF_ErrorCode code = call; \
+  if (code != BF_OK) {         \
+    BF_PrintError(code);    \
+    return HT_ERROR;        \
+  }                         \
+}
+
+
+
+
 typedef enum HT_ErrorCode {
   HT_OK,
   HT_ERROR
 } HT_ErrorCode;
+
 
 typedef struct Record {
 	int id;
@@ -12,6 +25,7 @@ typedef struct Record {
 	char surname[20];
 	char city[20];
 } Record;
+
 
 typedef struct tupleId{
 	int block;
@@ -71,7 +85,7 @@ HT_ErrorCode HT_CloseFile(
 HT_ErrorCode HT_InsertEntry(
 	int indexDesc,	/* θέση στον πίνακα με τα ανοιχτά αρχεία */
 	Record record,		/* δομή που προσδιορίζει την εγγραφή */
-	TupleId tupleId, /* Η θέση της εγγραφής στο πρωτεύον ευρετήριο */
+	TupleId* tupleId, /* Η θέση της εγγραφής στο πρωτεύον ευρετήριο */
 	UpdateRecordArray *updateArray /* πίνακας με τις αλλαγές που προέκυψαν από
 	την εισαγωγη της νέας εγγραφής */
 	);

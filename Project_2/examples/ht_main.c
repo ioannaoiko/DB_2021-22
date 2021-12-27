@@ -62,37 +62,37 @@ const char* cities[] = {
   }
 
 int main() {
-  BF_Init(LRU);
+  // BF_Init(LRU);
   
-  CALL_OR_DIE(HT_Init());
+  // CALL_OR_DIE(HT_Init());
 
-  int indexDesc;
-  CALL_OR_DIE(HT_CreateIndex(FILE_NAME, GLOBAL_DEPT));
-  CALL_OR_DIE(HT_OpenIndex(FILE_NAME, &indexDesc)); 
+  // int indexDesc;
+  // CALL_OR_DIE(HT_CreateIndex(FILE_NAME, GLOBAL_DEPT));
+  // CALL_OR_DIE(HT_OpenIndex(FILE_NAME, &indexDesc)); 
 
-  Record record;
-  srand(12569874);
-  int r;
+  // Record record;
+  // srand(12569874);
+  // int r;
   printf("Insert Entries\n");
-  for (int id = 0; id < RECORDS_NUM; ++id) {
-    // create a record
-    record.id = id;
-    r = rand() % 12;
-    memcpy(record.name, names[r], strlen(names[r]) + 1);
-    r = rand() % 12;
-    memcpy(record.surname, surnames[r], strlen(surnames[r]) + 1);
-    r = rand() % 10;
-    memcpy(record.city, cities[r], strlen(cities[r]) + 1);
+  // for (int id = 0; id < RECORDS_NUM; ++id) {
+  //   // create a record
+  //   record.id = id;
+  //   r = rand() % 12;
+  //   memcpy(record.name, names[r], strlen(names[r]) + 1);
+  //   r = rand() % 12;
+  //   memcpy(record.surname, surnames[r], strlen(surnames[r]) + 1);
+  //   r = rand() % 10;
+  //   memcpy(record.city, cities[r], strlen(cities[r]) + 1);
 
-    CALL_OR_DIE(HT_InsertEntry(indexDesc, record));
-  }
+  //   CALL_OR_DIE(HT_InsertEntry(indexDesc, record));
+  // }
 
-  printf("RUN PrintAllEntries\n");
-  int id = rand() % RECORDS_NUM;
-  CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &id));
-  //CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
+  // printf("RUN PrintAllEntries\n");
+  // int id = rand() % RECORDS_NUM;
+  // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &id));
+  // //CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
 
 
-  CALL_OR_DIE(HT_CloseFile(indexDesc));
-  BF_Close();
+  // CALL_OR_DIE(HT_CloseFile(indexDesc));
+  // BF_Close();
 }

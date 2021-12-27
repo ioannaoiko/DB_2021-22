@@ -1,20 +1,8 @@
-#ifndef HASH_FILE_H
-#define HASH_FILE_H
+#ifndef SHT_FILE_H
+#define SHT_FILE_H
 
 #include "hash_file.h"
 
-typedef enum HT_ErrorCode {
-  HT_OK,
-  HT_ERROR
-} HT_ErrorCode;
-
-
-typedef struct Record {
-	int id;
-	char name[15];
-	char surname[20];
-	char city[20];
-} Record;
 
 
 
@@ -25,13 +13,13 @@ typedef struct{
 } SecondaryRecord;
 
 
-typedef struct {  //μπορειτε να αλλαξετε τη δομη συμφωνα  με τις ανάγκες σας
-	char surname[20];
-	char city[20];
-	TupleId oldTupleId; // η παλια θέση της εγγραφής πριν την εισαγωγή της νέας
-	TupleId newTupleId; // η νέα θέση της εγγραφής που μετακινήθηκε μετα την εισαγωγή της νέας εγγραφής 
+// typedef struct {  //μπορειτε να αλλαξετε τη δομη συμφωνα  με τις ανάγκες σας
+// 	char surname[20];
+// 	char city[20];
+// 	TupleId oldTupleId; // η παλια θέση της εγγραφής πριν την εισαγωγή της νέας
+// 	TupleId newTupleId; // η νέα θέση της εγγραφής που μετακινήθηκε μετα την εισαγωγή της νέας εγγραφής 
 	
-} UpdateRecordArray;
+// } UpdateRecordArray;
 
 
 
@@ -44,6 +32,7 @@ HT_ErrorCode SHT_CreateSecondaryIndex(
 	int attrLength, /* μήκος πεδίου-κλειδιού */
 	int depth,/* το ολικό βάθος ευρετηρίου επεκτατού κατακερματισμού */
 	char *fileName /* όνομα αρχείου πρωτεύοντος ευρετηρίου*/
+	
 	);
 
 
