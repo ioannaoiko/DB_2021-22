@@ -252,7 +252,6 @@ int HashFunction( Record record, int depth)
 HT_ErrorCode CreateNewBucket( int filedesc, Record record, int bucket, TupleId* tupleid, UpdateRecordArray* updaterecordarray)
 {
 
-
   //init for block
   BF_Block* block;
   BF_Block_Init(&block);
@@ -260,6 +259,7 @@ HT_ErrorCode CreateNewBucket( int filedesc, Record record, int bucket, TupleId* 
   //to eyretirio mas arxizei apo to block = 0
   int block_info = 0;
   CALL_BF(BF_GetBlock(filedesc, block_info, block));
+  
   char* data = BF_Block_GetData( block);
   int global_depth = data[0];   //global depth
   CALL_BF( BF_UnpinBlock( block));
@@ -751,7 +751,6 @@ HT_ErrorCode CreateNewBucket( int filedesc, Record record, int bucket, TupleId* 
 
       num_new++;
     }
-
   }  
   CALL_BF( BF_UnpinBlock( block));
 
@@ -1211,6 +1210,7 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record, TupleId* tupleId, Upda
   
   //global depth 
   int depth = data[0];
+  printf("depth %d\n", depth);
   CALL_BF( BF_UnpinBlock( block)); 
   //Hashing
   int HashNum = HashFunction( record, depth);
@@ -1221,7 +1221,7 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record, TupleId* tupleId, Upda
   i = 1;
   int num_info = 1;
   int block_info = 0;
-  CALL_BF(BF_GetBlock(filedesc, i, block));
+  CALL_BF(BF_GetBlock(filedesc, 1, block));
   data = BF_Block_GetData( block);
   
   
@@ -1307,7 +1307,6 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record, TupleId* tupleId, Upda
       k++;
       
   }
-
   //ξεχωριζω τα πεδια του record
   int id = record.id;
   char name[15];
@@ -1326,7 +1325,6 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record, TupleId* tupleId, Upda
   if( k == (BF_BLOCK_SIZE-sizeof(int))/sizeof(record))
   { 
     //η περιπτωση που το μπλοκ μας ειναι γεματο
-
     data = BF_Block_GetData(block);
     int depth_bucket = data[0];
     CALL_BF( BF_UnpinBlock( block)); 
@@ -1353,12 +1351,13 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record, TupleId* tupleId, Upda
 
     if( depth == depth_bucket)
     { 
-      CreateNewHashTable( filedesc, record, bucket, &tupleId, updaterecordarray);
+      CreateNewHashTable( filedesc, record, bucket, tupleId, updaterecordarray);
     }
     else
     {
-      CreateNewBucket( filedesc, record, bucket, &tupleId, updaterecordarray);
+      CreateNewBucket( filedesc, record, bucket, tupleId, updaterecordarray);
     }
+
   }
   //αν χωραει στο μπλοκ η εγγραφη τοτε την χασαρουμε
   else
@@ -1381,7 +1380,7 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record, TupleId* tupleId, Upda
 
     tupleId->block = bucket;
     tupleId->index = k;
-
+    
     CALL_BF( BF_UnpinBlock( block));
 
   }

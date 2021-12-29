@@ -52,7 +52,32 @@ const char* cities[] = {
   "Tokyo",
   "Hong Kong",
   "Munich",
-  "Miami"
+  "Miami",
+  "PEANUT",
+  "Tokyo",
+  "Delhi",
+  "Shanghai", 
+  "Sao Paulo",
+  "Mexico City",
+  "Dhaka",
+  "Cairo",
+  "Beijing",
+  "Mumbai",
+  "Osaka",
+  "Karachi",
+  "Chongqing",
+  "Istanbul",
+  "Buenos Aires",
+  "Kolkata",
+  "Kinshasa",
+  "Lagos",
+  "Manila",
+  "Tianjin",
+  "Guangzhou",
+  "Rio De Janeiro",
+  "Lahore",
+  "Bangalore", 
+  "Moscow"
 };
 
 #define CALL_OR_DIE(call)     \
@@ -88,31 +113,33 @@ int main() {
   SecondaryRecord srecord;
   srand(12569874);
   int r;
+  UpdateRecordArray* updateArray;
 
-  for (int id = 0; id < 50 /*RECORDS_NUM*/; ++id) {
+  for (int id = 0; id < RECORDS_NUM; ++id) {
+    printf("id = %d\n", id);
+// 
+    // char city[20] = "T";
+    // char num[19];
+    // char city[20];
+    // sprintf(num, "%d", rand()%(id+1));
+    // strcat(city, num);
+    // printf("%s\n", city);
+    // break;
     // create a record
     record.id = id;
     r = rand() % 12;
     memcpy(record.name, names[r], strlen(names[r]) + 1);
     r = rand() % 12;
     memcpy(record.surname, surnames[r], strlen(surnames[r]) + 1);
-    r = rand() % 10;
+    r = rand() % 30;
     memcpy(record.city, cities[r], strlen(cities[r]) + 1);
 
-    UpdateRecordArray* updateArray = malloc(((BF_BLOCK_SIZE - sizeof(int))/sizeof( Record))*sizeof(UpdateRecordArray)); 
+    updateArray = calloc((BF_BLOCK_SIZE - sizeof(int))/sizeof( Record), sizeof( UpdateRecordArray)); 
     
     CALL_OR_DIE(HT_InsertEntry(indexDesc, record, &tid, updateArray));
-    // if( strcmp(cities[r], cities[0]) == 0)
-    // {
-    //     printf("name = %s\n", record.name);
-
-    //   printf("opaaaaaaaaaaaaaaa\n");
-    // }
 
     if( updateArray[0].city != NULL && strlen(updateArray[0].city) != 0 && updateArray[0].surname != NULL && strlen(updateArray[0].surname) != 0)
     {
-      printf("mpaino se update\n");
-
       CALL_OR_DIE( SHT_SecondaryUpdateEntry( sindexDesc, updateArray));
     }
 
@@ -121,12 +148,14 @@ int main() {
     srecord.tupleId.index = tid.index;
   
     CALL_OR_DIE(SHT_SecondaryInsertEntry( sindexDesc, srecord));
-    
+
     free( updateArray);
   }
 
   
-  CALL_OR_DIE( SHT_PrintAllEntries(sindexDesc, cities[0]));
+  // CALL_OR_DIE( SHT_PrintAllEntries(sindexDesc, "T0"));
+  // CALL_OR_DIE( HT_HashStatistics(FILE_NAME));
+  // CALL_OR_DIE( SHT_HashStatistics( FILE_NAME_SEC));
   CALL_OR_DIE(SHT_CloseSecondaryIndex(sindexDesc));
 
 }
