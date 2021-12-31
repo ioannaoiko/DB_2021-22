@@ -115,14 +115,14 @@ int main() {
   int r;
   UpdateRecordArray* updateArray;
 
-  for (int id = 0; id < RECORDS_NUM; ++id) {
-    printf("id = %d\n", id);
+  for (int id = 0; id < 269; ++id) {
+    // printf("id = %d\n", id);
 // 
-    // char city[20] = "T";
-    // char num[19];
-    // char city[20];
-    // sprintf(num, "%d", rand()%(id+1));
-    // strcat(city, num);
+    char city1[20] = "T";
+    char num[19];
+    // char city1[20];
+    sprintf(num, "%d", rand()%(id+1));
+    strcat(city1, num);
     // printf("%s\n", city);
     // break;
     // create a record
@@ -132,7 +132,7 @@ int main() {
     r = rand() % 12;
     memcpy(record.surname, surnames[r], strlen(surnames[r]) + 1);
     r = rand() % 30;
-    memcpy(record.city, cities[r], strlen(cities[r]) + 1);
+    memcpy(record.city, city1, strlen(city1) + 1);
 
     updateArray = calloc((BF_BLOCK_SIZE - sizeof(int))/sizeof( Record), sizeof( UpdateRecordArray)); 
     
@@ -153,9 +153,9 @@ int main() {
   }
 
   
-  // CALL_OR_DIE( SHT_PrintAllEntries(sindexDesc, "T0"));
-  // CALL_OR_DIE( HT_HashStatistics(FILE_NAME));
-  // CALL_OR_DIE( SHT_HashStatistics( FILE_NAME_SEC));
+  CALL_OR_DIE( SHT_PrintAllEntries(sindexDesc, "T15"));
+  CALL_OR_DIE( HT_HashStatistics(FILE_NAME));
+  CALL_OR_DIE( SHT_HashStatistics( FILE_NAME_SEC));
   CALL_OR_DIE(SHT_CloseSecondaryIndex(sindexDesc));
 
 }

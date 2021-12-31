@@ -1210,7 +1210,7 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record, TupleId* tupleId, Upda
   
   //global depth 
   int depth = data[0];
-  printf("depth %d\n", depth);
+  // printf("depth %d\n", depth);
   CALL_BF( BF_UnpinBlock( block)); 
   //Hashing
   int HashNum = HashFunction( record, depth);
