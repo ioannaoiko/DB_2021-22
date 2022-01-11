@@ -244,7 +244,7 @@ int SHT_HashFunction( SecondaryRecord srecord, int depth)
 
 HT_ErrorCode SHT_CreateNewBucket( int filedesc, SecondaryRecord record, int bucket)
 {
-
+  // printf("cr n \n\n")
 
   //init for block
   BF_Block* block;
@@ -635,7 +635,6 @@ HT_ErrorCode SHT_CreateNewBucket( int filedesc, SecondaryRecord record, int buck
 
       HashNum-=128;
     }
-
 
     int* d = data + HashNum*sizeof(int);
     int bucket_from_hash = d[0];
@@ -1312,6 +1311,7 @@ HT_ErrorCode SHT_SecondaryInsertEntry (int indexDesc, SecondaryRecord record ) {
   //αν χωραει στο μπλοκ η εγγραφη τοτε την χασαρουμε
   else
   {
+    // printf("e;aaaaa\n");
     //index_key
     memcpy( data + k*sizeof(SecondaryRecord) , key, sizeof( key));
     BF_Block_SetDirty(block);
@@ -1338,6 +1338,7 @@ HT_ErrorCode SHT_SecondaryInsertEntry (int indexDesc, SecondaryRecord record ) {
 
 HT_ErrorCode SHT_SecondaryUpdateEntry (int indexDesc, UpdateRecordArray *updateArray ) {
   // insert code here
+  
   BF_Block *block;
   BF_Block_Init(&block);
 
@@ -1461,14 +1462,17 @@ HT_ErrorCode SHT_SecondaryUpdateEntry (int indexDesc, UpdateRecordArray *updateA
 
     //εχουμε βρει το καδο μας που χασαρουν τα index-key
     int bucket = d1[0];
+    // printf("bucket == %d\n", bucket);
     
     CALL_BF(BF_UnpinBlock(block));
     CALL_BF( BF_GetBlock( filedesc, bucket, block));
     data = BF_Block_GetData( block);
     d = data + sizeof(int);
+
     while( d < data + BF_BLOCK_SIZE - 1)
     { 
       char key_i[20];
+      
       strcpy( key_i, d);
       
       int* d1 = d + sizeof(key_i);
@@ -1477,8 +1481,10 @@ HT_ErrorCode SHT_SecondaryUpdateEntry (int indexDesc, UpdateRecordArray *updateA
       d1 = d + sizeof(key_i) + sizeof(int);
       int index_block = d1[0];
 
+
       if( strcmp( key_i, key_find) == 0 && block_bucket == tid_old.block && index_block == tid_old.index)
       {
+
         memcpy( d + sizeof(key_i), &(tid_new.block), sizeof(int));
         BF_Block_SetDirty( block); 
        
