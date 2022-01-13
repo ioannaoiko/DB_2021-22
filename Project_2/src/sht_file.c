@@ -1347,8 +1347,11 @@ HT_ErrorCode SHT_SecondaryUpdateEntry (int indexDesc, UpdateRecordArray *updateA
   char surname[20];
   TupleId tid_old;
   TupleId tid_new;
+    
+  int filedesc = filetable->table[indexDesc]->file_desc;
 
-  CALL_BF(BF_GetBlock(indexDesc, 0, block));
+  ////////////////////////////////////////////////////////////
+  CALL_BF(BF_GetBlock(filedesc, 0, block));
 
   char *data;
   data = BF_Block_GetData(block) + 20;
@@ -1388,7 +1391,6 @@ HT_ErrorCode SHT_SecondaryUpdateEntry (int indexDesc, UpdateRecordArray *updateA
       srecord.tupleId.block = tid_old.block;
       srecord.tupleId.index = tid_old.index;
     }
-    int filedesc = indexDesc;
 
     CALL_BF( BF_UnpinBlock( block));
     CALL_BF(BF_GetBlock(filedesc, 1, block));
@@ -1403,7 +1405,6 @@ HT_ErrorCode SHT_SecondaryUpdateEntry (int indexDesc, UpdateRecordArray *updateA
     CALL_BF(BF_UnpinBlock(block));
     CALL_BF(BF_GetBlock(filedesc, i, block));
     data = BF_Block_GetData(block);
-
     //Αν η θεση του πινακα που χασαρουμε δεν ειναι στο 2ο μπλοκ ευρετηριου τοτε παμε στο
     //επομενο και ουτε καθεξης
 
@@ -1463,10 +1464,15 @@ HT_ErrorCode SHT_SecondaryUpdateEntry (int indexDesc, UpdateRecordArray *updateA
     //εχουμε βρει το καδο μας που χασαρουν τα index-key
     int bucket = d1[0];
     // printf("bucket == %d\n", bucket);
-    
+    int nummm_b;
+    BF_GetBlockCounter( filedesc, &nummm_b);
+
     CALL_BF(BF_UnpinBlock(block));
+
     CALL_BF( BF_GetBlock( filedesc, bucket, block));
+
     data = BF_Block_GetData( block);
+
     d = data + sizeof(int);
 
     while( d < data + BF_BLOCK_SIZE - 1)
@@ -1604,19 +1610,22 @@ HT_ErrorCode SHT_PrintAllEntries(int sindexDesc, char *index_key ) {
   strcpy( fileName, data11);
 
   int indexDesc;
+  int counterr = 0;
   CALL_BF( BF_OpenFile( fileName, &indexDesc));
   while (d < data + BF_BLOCK_SIZE - 1)
   {
+
+    if( bucket == 14)
+    {
+      counterr++;
+    }
     if ( strcmp( key, d) == 0)
     {
-
-
       int* d1 = d + sizeof(key);
       int bucket_block = d1[0];
       
       int* d2 = d + sizeof(key) + sizeof(int);
       int index_block = d2[0];
-      printf("\n\nkey = %s kai block = %d kai ind = %d\n", d, bucket_block, index_block);
 
       
       CALL_BF(BF_UnpinBlock(block));
@@ -1646,7 +1655,6 @@ HT_ErrorCode SHT_PrintAllEntries(int sindexDesc, char *index_key ) {
     }
     d = d + sizeof(SecondaryRecord);
   }
-
   CALL_BF(BF_UnpinBlock(block));
   CALL_BF( BF_CloseFile( indexDesc));
 
@@ -1812,9 +1820,6 @@ HT_ErrorCode SHT_HashStatistics(char *filename ) {
 HT_ErrorCode SHT_InnerJoin(int sindexDesc1, int sindexDesc2,  char *index_key ) 
 {
   //insert code here
-  // int filedesc;
-  // CALL_BF(BF_OpenFile(filename, &filedesc));
-
 
   BF_Block* block;
   BF_Block_Init(&block);
@@ -1826,14 +1831,18 @@ HT_ErrorCode SHT_InnerJoin(int sindexDesc1, int sindexDesc2,  char *index_key )
 
 
   //FOR THE FIRST FILE
-  CALL_BF( BF_GetBlock( sindexDesc1, 0, block));
+  int sfiledesc1 = filetable->table[sindexDesc1]->file_desc;
+  CALL_BF( BF_GetBlock( sfiledesc1, 0, block));
   char* data_1 = BF_Block_GetData(block);
   strcpy( Father_file_1, data_1);
   CALL_BF( BF_UnpinBlock( block));
   int indexDesc1;
-  BF_OpenFile( Father_file_1, &indexDesc1);
 
-  CALL_BF(BF_GetBlock( sindexDesc1, 1, block));
+  HT_OpenIndex(Father_file_1, &indexDesc1);
+  int filedesc1 = filetable->table[indexDesc1]->file_desc;
+
+
+  CALL_BF(BF_GetBlock( sfiledesc1, 1, block));
   int* data_11 = BF_Block_GetData( block);
   int depth_1 = data_11[0];
   CALL_BF( BF_UnpinBlock( block))
@@ -1849,14 +1858,17 @@ HT_ErrorCode SHT_InnerJoin(int sindexDesc1, int sindexDesc2,  char *index_key )
   
   
   //FOR THE SECOND FILE
-  BF_GetBlock(sindexDesc2, 0, block);
+  int sfiledesc2 = filetable->table[sindexDesc2]->file_desc;
+
+  BF_GetBlock(sfiledesc2, 0, block);
   char* data_2 = BF_Block_GetData(block);
   strcpy( Father_file_2, data_2);
   CALL_BF(BF_UnpinBlock(block));
   int indexDesc2;
-  BF_OpenFile(Father_file_2, &indexDesc2);
-  
-  BF_GetBlock(sindexDesc2, 1, block);
+  HT_OpenIndex(Father_file_2, &indexDesc2);
+  int filedesc2 = filetable->table[indexDesc2]->file_desc;
+
+  BF_GetBlock(sfiledesc2, 1, block);
   int* data_22 = BF_Block_GetData(block);
   int depth_2 = data_22[0];  
   CALL_BF(BF_UnpinBlock(block));
@@ -1868,7 +1880,6 @@ HT_ErrorCode SHT_InnerJoin(int sindexDesc1, int sindexDesc2,  char *index_key )
   }
   ////////////////////////////////////////
 
-
   // int num_of_blocks;
 
   
@@ -1878,9 +1889,8 @@ HT_ErrorCode SHT_InnerJoin(int sindexDesc1, int sindexDesc2,  char *index_key )
   int num_info_1 = 2;
   int num_hash_1 = 0;
 
-  CALL_BF(BF_GetBlock( sindexDesc1, hash_block_1, block));
+  CALL_BF(BF_GetBlock( sfiledesc1, hash_block_1, block));
 
-  // char *data;
   int previous_bucket_1 = -1;
 
   char name[15];
@@ -1891,6 +1901,7 @@ HT_ErrorCode SHT_InnerJoin(int sindexDesc1, int sindexDesc2,  char *index_key )
   int num_of_ints_1 = 0;
 
   data_1 = BF_Block_GetData(block);
+  
   while (num_of_ints_1 < a_1)
   {
 
@@ -1900,27 +1911,22 @@ HT_ErrorCode SHT_InnerJoin(int sindexDesc1, int sindexDesc2,  char *index_key )
     if (bucket_1 != previous_bucket_1)
     {
       CALL_BF(BF_UnpinBlock(block));
-      CALL_BF(BF_GetBlock( sindexDesc1, bucket_1, block));
+      CALL_BF(BF_GetBlock( sfiledesc1, bucket_1, block));
       char *d_1_block = BF_Block_GetData(block) + sizeof(int);
       int num_in_bucket_1 = 0;
-
+      
 
       char key[20];
-      while (num_in_bucket_1 < BF_BLOCK_SIZE / sizeof(SecondaryRecord))
+      while (num_in_bucket_1 <= BF_BLOCK_SIZE/sizeof(SecondaryRecord))
       {
-        // printf("hel\n");
-        d_1_block = d_1_block +sizeof(SecondaryRecord);
 
         char index_key_1[20];
         strcpy( index_key_1, d_1_block);
-        // printf("ela %d\n", strlen( d_1_block));
 
-        if( strcmp( index_key_1, "NULL") == 0|| index_key_1 == 0||index_key_1 == "NULL" || strlen( index_key_1) == 0)
+        if( strcmp( index_key_1, "NULL") == 0 || strlen( index_key_1) == 0)
         {
-          // printf("i am here\n");
           break;
         }
-        // printf("ela %s\n", index_key_1);
 
         ////
         int *d1 = d_1_block + sizeof(key);
@@ -1928,11 +1934,10 @@ HT_ErrorCode SHT_InnerJoin(int sindexDesc1, int sindexDesc2,  char *index_key )
 
         int *d2 = d_1_block + sizeof(key) + sizeof(int);
         int index_block = d2[0];
-        // printf("ela %d\n", bucket_block);
 
         CALL_BF(BF_UnpinBlock(block));
-        CALL_BF(BF_GetBlock( indexDesc1, bucket_block, block));
-        // printf("ela\n");
+
+        CALL_BF(BF_GetBlock( filedesc1, bucket_block, block));
 
         char* data11 = BF_Block_GetData(block);
 
@@ -1954,10 +1959,6 @@ HT_ErrorCode SHT_InnerJoin(int sindexDesc1, int sindexDesc2,  char *index_key )
         data1 = d4 + sizeof(int) + sizeof(name_1) + sizeof(surname_1);
         strcpy(city_1, data1);
 
-        // printf("eco na = %s kai su = %s\n", name_1, surname_1);
-        num_in_bucket_1++;
-
-
 
         //open second file
 
@@ -1966,11 +1967,10 @@ HT_ErrorCode SHT_InnerJoin(int sindexDesc1, int sindexDesc2,  char *index_key )
         int num_info_2 = 2;
         int num_hash_2 = 0;
 
-        CALL_BF(BF_GetBlock( sindexDesc2, hash_block_2, block));
+        CALL_BF(BF_GetBlock( sfiledesc2, hash_block_2, block));
         data_2 = BF_Block_GetData(block);
 
 
-        // char *data;
         int previous_bucket_2 = -1;
 
         char name_2[15];
@@ -1987,14 +1987,14 @@ HT_ErrorCode SHT_InnerJoin(int sindexDesc1, int sindexDesc2,  char *index_key )
           if (bucket_2 != previous_bucket_2)
           {
             CALL_BF(BF_UnpinBlock(block));
-            CALL_BF(BF_GetBlock( sindexDesc2, bucket_2, block));
+            CALL_BF(BF_GetBlock( sfiledesc2, bucket_2, block));
             char *d_2_block = BF_Block_GetData(block) + sizeof(int);
             int num_in_bucket_2 = 0;
 
-            while (num_in_bucket_2 < BF_BLOCK_SIZE / sizeof( SecondaryRecord))
+            while (num_in_bucket_2 <= BF_BLOCK_SIZE / sizeof( SecondaryRecord))
             {
               
-              d_2_block = d_2_block + sizeof( SecondaryRecord);
+              
 
               if( strcmp( d_2_block, "NULL") == 0 || strlen( d_2_block) == 0)
               {
@@ -2014,7 +2014,7 @@ HT_ErrorCode SHT_InnerJoin(int sindexDesc1, int sindexDesc2,  char *index_key )
               CALL_BF(BF_UnpinBlock(block));
 
 
-              CALL_BF(BF_GetBlock( indexDesc2, bucket_block, block));
+              CALL_BF(BF_GetBlock( filedesc2, bucket_block, block));
 
               char* data22 = BF_Block_GetData(block);
 
@@ -2033,13 +2033,12 @@ HT_ErrorCode SHT_InnerJoin(int sindexDesc1, int sindexDesc2,  char *index_key )
               data1 = d4 + sizeof(int) + sizeof(name_2) + sizeof(surname_2);
               strcpy(city_2, data1);
 
-
               if( strcmp( index_key, "NULL") == 0)
               {
                 printf("ids:  %d - %d\n", id_1, id_2);                
                 printf("names:  %s - %s\n", name_1, name_2);
                 printf("surnames:  %s - %s\n", surname_1, surname_2);
-                printf("cities:  %s - %s\n", city_1, city_2);
+                printf("cities:  %s - %s\n\n", city_1, city_2);
               
               }
               else if( strcmp( index_key_1, index_key_2) == 0 && strcmp( index_key_1, index_key) == 0)
@@ -2047,14 +2046,14 @@ HT_ErrorCode SHT_InnerJoin(int sindexDesc1, int sindexDesc2,  char *index_key )
                 printf("ids:  %d - %d\n", id_1, id_2);                
                 printf("names:  %s - %s\n", name_1, name_2);
                 printf("surnames:  %s - %s\n", surname_1, surname_2);
-                printf("cities:  %s - %s\n", city_1, city_2);
+                printf("cities:  %s - %s\n\n", city_1, city_2);
               }
-              // printf("elaaaaaaaaaaaaaaaaa\n");
+              d_2_block = d_2_block + sizeof( SecondaryRecord);
               num_in_bucket_2++;
             }
 
             CALL_BF(BF_UnpinBlock(block));
-            CALL_BF(BF_GetBlock( sindexDesc2, hash_block_2, block))
+            CALL_BF(BF_GetBlock( sfiledesc2, hash_block_2, block))
             data_2 = BF_Block_GetData(block);
             previous_bucket_2 = bucket_2;
           }
@@ -2070,7 +2069,7 @@ HT_ErrorCode SHT_InnerJoin(int sindexDesc1, int sindexDesc2,  char *index_key )
 
             CALL_BF(BF_UnpinBlock(block));
             //αρα διαβαζουμε απο το μπλοκ πληροφοριες ποιο ειναι το επομενο
-            CALL_BF(BF_GetBlock( sindexDesc2, block_info_2, block));
+            CALL_BF(BF_GetBlock( sfiledesc2, block_info_2, block));
 
             char *data2;
             //παιρνουμε τον αριθμο του επομενου μπλοκ ευρετηριου
@@ -2092,7 +2091,7 @@ HT_ErrorCode SHT_InnerJoin(int sindexDesc1, int sindexDesc2,  char *index_key )
               block_info_2 = d1[0];
 
               CALL_BF(BF_UnpinBlock(block));
-              CALL_BF(BF_GetBlock( sindexDesc2, block_info_2, block));
+              CALL_BF(BF_GetBlock( sfiledesc2, block_info_2, block));
 
               data2 = BF_Block_GetData(block);
               num_info_2 = 0;
@@ -2104,18 +2103,19 @@ HT_ErrorCode SHT_InnerJoin(int sindexDesc1, int sindexDesc2,  char *index_key )
             num_hash_2 = 0;
 
             CALL_BF(BF_UnpinBlock(block));
-            CALL_BF(BF_GetBlock( sindexDesc2, hash_block_2, block));
+            CALL_BF(BF_GetBlock( sfiledesc2, hash_block_2, block));
             data_2 = BF_Block_GetData(block);
           }
 
         }
+        d_1_block = d_1_block + sizeof(SecondaryRecord);
 
         num_in_bucket_1++;
 
       }
 
       CALL_BF(BF_UnpinBlock(block));
-      CALL_BF(BF_GetBlock( sindexDesc1, hash_block_1, block))
+      CALL_BF(BF_GetBlock( sfiledesc1, hash_block_1, block))
       data_1 = BF_Block_GetData(block);
       previous_bucket_1 = bucket_1;
     }
@@ -2132,7 +2132,7 @@ HT_ErrorCode SHT_InnerJoin(int sindexDesc1, int sindexDesc2,  char *index_key )
 
       CALL_BF(BF_UnpinBlock(block));
       //αρα διαβαζουμε απο το μπλοκ πληροφοριες ποιο ειναι το επομενο
-      CALL_BF(BF_GetBlock( sindexDesc1, block_info_1, block));
+      CALL_BF(BF_GetBlock( sfiledesc1, block_info_1, block));
 
       char *data1;
       //παιρνουμε τον αριθμο του επομενου μπλοκ ευρετηριου
@@ -2154,7 +2154,7 @@ HT_ErrorCode SHT_InnerJoin(int sindexDesc1, int sindexDesc2,  char *index_key )
         block_info_1 = d1[0];
 
         CALL_BF(BF_UnpinBlock(block));
-        CALL_BF(BF_GetBlock(sindexDesc1, block_info_1, block));
+        CALL_BF(BF_GetBlock(sfiledesc1, block_info_1, block));
 
         data1 = BF_Block_GetData(block);
         num_info_1 = 0;
@@ -2166,11 +2166,12 @@ HT_ErrorCode SHT_InnerJoin(int sindexDesc1, int sindexDesc2,  char *index_key )
       num_hash_1 = 0;
 
       CALL_BF(BF_UnpinBlock(block));
-      CALL_BF(BF_GetBlock(sindexDesc1, hash_block_1, block));
+      CALL_BF(BF_GetBlock(sfiledesc1, hash_block_1, block));
       data_1 = BF_Block_GetData(block);
     }
   }
-  
+  HT_CloseFile(indexDesc1);
+  HT_CloseFile(indexDesc2);
 
   return HT_OK;
 }

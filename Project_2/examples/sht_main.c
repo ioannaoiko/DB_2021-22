@@ -108,13 +108,12 @@ int main() {
   
   int sindexDesc;
   char city[5] = "city";
-  // CALL_OR_DIE( SHT_CreateSecondaryIndex(FILE_NAME_SEC, city, 4, GLOBAL_DEPT, FILE_NAME));
+  CALL_OR_DIE( SHT_CreateSecondaryIndex(FILE_NAME_SEC, city, 4, GLOBAL_DEPT, FILE_NAME));
 
 
   CALL_OR_DIE( HT_OpenIndex(FILE_NAME, &indexDesc)); 
-// printf("oo\n");
 
-  // CALL_OR_DIE( SHT_OpenSecondaryIndex( FILE_NAME_SEC, &sindexDesc));
+  CALL_OR_DIE( SHT_OpenSecondaryIndex( FILE_NAME_SEC, &sindexDesc));
 
   TupleId tid;
 
@@ -125,75 +124,10 @@ int main() {
   int r;
   UpdateRecordArray* updateArray;
 
-  // for (int id = 0; id < 269; ++id) {
-
-  //   char city1[20] = "T";
-  //   char num[19];
-
-  //   sprintf(num, "%d", rand()%(id+1));
-  //   strcat(city1, num);
-
-  //   record.id = id;
-  //   r = rand() % 12;
-  //   memcpy(record.name, names[r], strlen(names[r]) + 1);
-  //   r = rand() % 12;
-  //   memcpy(record.surname, surnames[r], strlen(surnames[r]) + 1);
-  //   r = rand() % 30;
-  //   memcpy(record.city, city1, strlen(city1) + 1);
-
-  //   updateArray = calloc((BF_BLOCK_SIZE - sizeof(int))/sizeof( Record), sizeof( UpdateRecordArray)); 
-    
-  //   CALL_OR_DIE(HT_InsertEntry(indexDesc, record, &tid, updateArray));
-
-  //   if( updateArray[0].city != NULL && strlen(updateArray[0].city) != 0 && updateArray[0].surname != NULL && strlen(updateArray[0].surname) != 0)
-  //   {
-  //     CALL_OR_DIE( SHT_SecondaryUpdateEntry( sindexDesc, updateArray));
-  //   }
-
-
-  //   // if(strcmp( city1, "T1") == 0)
-  //   // {
-  //   //   printf("id = %d\n", id);
-  //   //   printf("t.b = %d kai i = %d\n", tid.block, tid.index);
-  //   // }
-
-    
-    
-  //   strcpy(srecord.index_key, record.city);
-  //   // if( id == 103)
-  //   // {
-  //   //   printf("c == %s\n\n", srecord.index_key);
-  //   // }
-  //   srecord.tupleId.block = tid.block;
-  //   srecord.tupleId.index = tid.index;
-  
-  //   CALL_OR_DIE(SHT_SecondaryInsertEntry( sindexDesc, srecord));
-
-  //   free( updateArray);
-  // }
-
-  // printf("\n\n\n\n\n\n\n");
-
-  int indexDesc1;
-  CALL_OR_DIE( HT_CreateIndex(FILE_NAME1, GLOBAL_DEPT));
-
-  
-  int sindexDesc1;	
-  CALL_OR_DIE( SHT_CreateSecondaryIndex(FILE_NAME_SEC1, city, 4, GLOBAL_DEPT, FILE_NAME1));
-
-
-  CALL_OR_DIE( HT_OpenIndex(FILE_NAME1, &indexDesc1)); 
-
-  CALL_OR_DIE( SHT_OpenSecondaryIndex( FILE_NAME_SEC1, &sindexDesc1));
-
-
-  srand( 673897247);
-
-  for (int id = 0; id < 50; ++id) {
-
+  for (int id = 0; id < 269; ++id) {
 
     char city1[20] = "T";
-    char  num[19];
+    char num[19];
 
     sprintf(num, "%d", rand()%(id+1));
     strcat(city1, num);
@@ -208,47 +142,92 @@ int main() {
 
     updateArray = calloc((BF_BLOCK_SIZE - sizeof(int))/sizeof( Record), sizeof( UpdateRecordArray)); 
     
-    CALL_OR_DIE(HT_InsertEntry(indexDesc1, record, &tid, updateArray));
+    CALL_OR_DIE(HT_InsertEntry(indexDesc, record, &tid, updateArray));
 
-
-    CALL_OR_DIE( SHT_SecondaryUpdateEntry( sindexDesc1, updateArray));
-
-
+    CALL_OR_DIE( SHT_SecondaryUpdateEntry( sindexDesc, updateArray));
+    
+    
     strcpy(srecord.index_key, record.city);
     srecord.tupleId.block = tid.block;
     srecord.tupleId.index = tid.index;
   
+    CALL_OR_DIE(SHT_SecondaryInsertEntry( sindexDesc, srecord));
+
+    free( updateArray);
+  }
+
+  ///////////////////////////////////////////////////////////////
+
+  ///////////////////////////////////////////////////////////////
+  int indexDesc1;//1
+  CALL_OR_DIE( HT_CreateIndex(FILE_NAME1, GLOBAL_DEPT));
+
+  
+  int sindexDesc1;	//2
+  CALL_OR_DIE( SHT_CreateSecondaryIndex(FILE_NAME_SEC1, city, 4, GLOBAL_DEPT, FILE_NAME1));
+
+
+  CALL_OR_DIE( HT_OpenIndex(FILE_NAME1, &indexDesc1)); 
+
+  CALL_OR_DIE( SHT_OpenSecondaryIndex( FILE_NAME_SEC1, &sindexDesc1));
+
+
+  srand( 673897247);
+
+  for (int id = 0; id < 50; ++id) {
+
+    char city1[20] = "T";
+    char  num[19];
+
+    sprintf(num, "%d", rand()%(id+1));
+    strcat(city1, num);
+
+    record.id = id;
+
+    r = rand() % 12;
+    memcpy(record.name, names[r], strlen(names[r]) + 1);
+
+    r = rand() % 12;
+    memcpy(record.surname, surnames[r], strlen(surnames[r]) + 1);
+
+    r = rand() % 30;
+    memcpy(record.city, city1, strlen(city1) + 1);
+
+    updateArray = calloc((BF_BLOCK_SIZE - sizeof(int))/sizeof( Record), sizeof( UpdateRecordArray)); 
+
+    CALL_OR_DIE(HT_InsertEntry(indexDesc1, record, &tid, updateArray));
+
+    CALL_OR_DIE( SHT_SecondaryUpdateEntry( sindexDesc1, updateArray));
+
+    strcpy(srecord.index_key, record.city);
+    srecord.tupleId.block = tid.block;
+    srecord.tupleId.index = tid.index;
+
     CALL_OR_DIE(SHT_SecondaryInsertEntry( sindexDesc1, srecord));
 
     free( updateArray);
   }
 
+  printf("First\n\n\n");
+  CALL_OR_DIE( SHT_PrintAllEntries(sindexDesc, "T0"));
+  
+  printf("\n\nSecond\n\n\n");
+  CALL_OR_DIE( SHT_PrintAllEntries(sindexDesc1, "T0"));
 
-  CALL_OR_DIE( SHT_PrintAllEntries(sindexDesc1, "T27"));
-
-
-  // CALL_OR_DIE( SHT_InnerJoin( sindexDesc, sindexDesc1, "T1") );
-
-printf("i am out\n");
-
-
+  //////////////////////////////////////////////////////////////////////////////
 
 
-
-
-
-
-
-
-  ////////////////////////
-  //THEMAAAAAAAAAAAAAAAAAAAAAAAAAAAA ME COLSE SINDEXDESC
-  //
-  /////////////////////////
+  CALL_OR_DIE( SHT_OpenSecondaryIndex( FILE_NAME_SEC, &sindexDesc));
+  printf("\n\nJoin\n\n\n");
+  
+  CALL_OR_DIE( SHT_InnerJoin( sindexDesc, sindexDesc1, "T0") );
 
 
   CALL_OR_DIE(SHT_CloseSecondaryIndex(sindexDesc1));
-  // CALL_OR_DIE(SHT_CloseSecondaryIndex(sindexDesc));
+  CALL_OR_DIE(SHT_CloseSecondaryIndex(sindexDesc));
+
   CALL_OR_DIE(HT_CloseFile(indexDesc1));
   CALL_OR_DIE(HT_CloseFile(indexDesc));
+
 
 }

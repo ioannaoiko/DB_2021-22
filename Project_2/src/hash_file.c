@@ -181,7 +181,6 @@ HT_ErrorCode HT_OpenIndex(const char *fileName, int *indexDesc){
       break;
     }
   }
-
   filetable->table[*indexDesc] = malloc(sizeof(struct file_open));
   filetable->table[*indexDesc]->file_desc = filedesc;
   filetable->table[*indexDesc]->indexdesc = *indexDesc;
