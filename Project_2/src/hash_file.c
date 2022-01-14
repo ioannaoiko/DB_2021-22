@@ -9,14 +9,7 @@
 #include "hash_file.h"
 #define MAX_OPEN_FILES 20
 
-// #define CALL_BF(call)       \
-// {                           \
-//   BF_ErrorCode code = call; \
-//   if (code != BF_OK) {         \
-//     BF_PrintError(code);    \
-//     return HT_ERROR;        \
-//   }                         \
-// }
+
 
 
 struct file_open{
@@ -54,6 +47,7 @@ typedef struct changetable{
  * Η συνάρτηση HT_Init χρησιμοποιείται για την αρχικοποίηση κάποιον δομών που μπορεί να χρειαστείτε. 
  * Σε περίπτωση που εκτελεστεί επιτυχώς, επιστρέφεται HT_OK, ενώ σε διαφορετική περίπτωση κωδικός λάθους.
  */
+
 HT_ErrorCode HT_Init() 
 {
   //insert code here
@@ -685,6 +679,7 @@ HT_ErrorCode CreateNewBucket( int filedesc, Record record, int bucket, TupleId* 
       memcpy( data + num_old*sizeof(record) + sizeof(int) + sizeof(name) + sizeof(surname), city, sizeof(city));
       BF_Block_SetDirty(block);
 
+      //if is the new element than i update the tupleid for the new record
       if( i == (BF_BLOCK_SIZE -sizeof(int))/sizeof(record))
       {
         tupleid->block = bucket_from_hash;
@@ -692,6 +687,9 @@ HT_ErrorCode CreateNewBucket( int filedesc, Record record, int bucket, TupleId* 
       }
       else
       {
+
+        //if change the bucket or index for this record
+        //i update the array and add the record
         if( change_table[i].bucket != bucket_from_hash || change_table[i].index != num_old)
         {
           strcpy( updaterecordarray[num_update].surname, surname);
@@ -726,6 +724,7 @@ HT_ErrorCode CreateNewBucket( int filedesc, Record record, int bucket, TupleId* 
       memcpy( data + num_new*sizeof(record) + sizeof(int) + sizeof(name) + sizeof(surname), city, sizeof(city));
       BF_Block_SetDirty(block);
 
+      //if is the new element than i update the tupleid for the new record
       if( i == (BF_BLOCK_SIZE -sizeof(int))/sizeof(record))
       {
         tupleid->block = bucket_from_hash;
@@ -733,6 +732,9 @@ HT_ErrorCode CreateNewBucket( int filedesc, Record record, int bucket, TupleId* 
       }
       else
       {
+
+        //if change the bucket or index for this record
+        //i update the array and add the record
         if( change_table[i].bucket != bucket_from_hash || change_table[i].index != num_new)
         {
           strcpy( updaterecordarray[num_update].surname, surname);
@@ -1648,6 +1650,7 @@ HT_ErrorCode HT_PrintAllEntries(int indexDesc, int *id) {
 // που έχει κάθε bucket ενός αρχείου, Σε περίπτωση που εκτελεστεί επιτυχώς επιστρέφεται
 // HT_OK, ενώ σε διαφορετική περίπτωση κάποιος κωδικός λάθους.
 HT_ErrorCode HT_HashStatistics(char* filename){
+  
   int filedesc;
   CALL_BF(BF_OpenFile(filename, &filedesc));
 
