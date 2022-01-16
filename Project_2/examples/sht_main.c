@@ -49,43 +49,43 @@ const char* surnames[] = {
   "Halatsis"
 };
 
-const char* cities[] = {
-  "Athens",
-  "San Francisco",
-  "Los Angeles",
-  "Amsterdam",
-  "London",
-  "New York",
-  "Tokyo",
-  "Hong Kong",
-  "Munich",
-  "Miami",
-  "PEANUT",
-  "Tokyo",
-  "Delhi",
-  "Shanghai", 
-  "Sao Paulo",
-  "Mexico City",
-  "Dhaka",
-  "Cairo",
-  "Beijing",
-  "Mumbai",
-  "Osaka",
-  "Karachi",
-  "Chongqing",
-  "Istanbul",
-  "Buenos Aires",
-  "Kolkata",
-  "Kinshasa",
-  "Lagos",
-  "Manila",
-  "Tianjin",
-  "Guangzhou",
-  "Rio De Janeiro",
-  "Lahore",
-  "Bangalore", 
-  "Moscow"
-};
+// const char* cities[] = {
+//   "Athens",
+//   "San Francisco",
+//   "Los Angeles",
+//   "Amsterdam",
+//   "London",
+//   "New York",
+//   "Tokyo",
+//   "Hong Kong",
+//   "Munich",
+//   "Miami",
+//   "PEANUT",
+//   "Tokyo",
+//   "Delhi",
+//   "Shanghai", 
+//   "Sao Paulo",
+//   "Mexico City",
+//   "Dhaka",
+//   "Cairo",
+//   "Beijing",
+//   "Mumbai",
+//   "Osaka",
+//   "Karachi",
+//   "Chongqing",
+//   "Istanbul",
+//   "Buenos Aires",
+//   "Kolkata",
+//   "Kinshasa",
+//   "Lagos",
+//   "Manila",
+//   "Tianjin",
+//   "Guangzhou",
+//   "Rio De Janeiro",
+//   "Lahore",
+//   "Bangalore", 
+//   "Moscow"
+// };
 
 #define CALL_OR_DIE(call)     \
   {                           \
@@ -103,9 +103,11 @@ int main() {
   CALL_OR_DIE(HT_Init());
   CALL_OR_DIE(SHT_Init());
 
+  //δημιουργια πρωτευοντος ευρευτηριου
   int indexDesc;
   CALL_OR_DIE( HT_CreateIndex(FILE_NAME, GLOBAL_DEPT));
   
+  //Δημιουργία δευτερεύοντος ευρετηρίου.
   int sindexDesc;
   char city[5] = "city";
   CALL_OR_DIE( SHT_CreateSecondaryIndex(FILE_NAME_SEC, city, 4, GLOBAL_DEPT, FILE_NAME));
@@ -124,8 +126,8 @@ int main() {
   int r;
   UpdateRecordArray* updateArray;
 
+  //Δινουμε τιμες
   for (int id = 0; id < 269; ++id) {
-
     char city1[20] = "T";
     char num[19];
 
@@ -135,8 +137,10 @@ int main() {
     record.id = id;
     r = rand() % 12;
     memcpy(record.name, names[r], strlen(names[r]) + 1);
+    
     r = rand() % 12;
     memcpy(record.surname, surnames[r], strlen(surnames[r]) + 1);
+    
     r = rand() % 30;
     memcpy(record.city, city1, strlen(city1) + 1);
 
@@ -159,10 +163,11 @@ int main() {
   ///////////////////////////////////////////////////////////////
 
   ///////////////////////////////////////////////////////////////
+  //ΔΗμιουργία δεύτερου πρωτεύοντος ευρετηρίου
   int indexDesc1;//1
   CALL_OR_DIE( HT_CreateIndex(FILE_NAME1, GLOBAL_DEPT));
 
-  
+  //Δημιουργία δεύτερου δευτερεύοντος ευρετηρίου.
   int sindexDesc1;	//2
   CALL_OR_DIE( SHT_CreateSecondaryIndex(FILE_NAME_SEC1, city, 4, GLOBAL_DEPT, FILE_NAME1));
 
@@ -173,8 +178,7 @@ int main() {
 
 
   srand( 673897247);
-
-  for (int id = 0; id < 50; ++id) {
+  for (int id = 0; id < 197; ++id) {
 
     char city1[20] = "T";
     char  num[19];
@@ -222,7 +226,7 @@ int main() {
   
   CALL_OR_DIE( SHT_InnerJoin( sindexDesc, sindexDesc1, "T0") );
 
-
+  CALL_OR_DIE( SHT_HashStatistics( FILE_NAME_SEC));
   CALL_OR_DIE(SHT_CloseSecondaryIndex(sindexDesc1));
   CALL_OR_DIE(SHT_CloseSecondaryIndex(sindexDesc));
 

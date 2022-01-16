@@ -69,7 +69,6 @@ HT_ErrorCode SHT_CreateSecondaryIndex(const char *sfileName, char *attrName, int
   //save filename
   memcpy( data, fileName, 20);
   BF_Block_SetDirty( block);
-  // printf("%s\n", fileName);
 
 
   //save attr name
@@ -1360,6 +1359,7 @@ HT_ErrorCode SHT_SecondaryUpdateEntry (int indexDesc, UpdateRecordArray *updateA
 
   while (1)
   {
+    //ελεγχει αν υπαρχουν στοιχεια στο πινακα
     if (updateArray[Num].city == NULL || strlen(updateArray[Num].city) == 0 || updateArray[Num].surname == NULL || strlen(updateArray[Num].surname) == 0)
     {
       break;
@@ -1376,6 +1376,7 @@ HT_ErrorCode SHT_SecondaryUpdateEntry (int indexDesc, UpdateRecordArray *updateA
     char key_find[20];
     SecondaryRecord srecord;
 
+    //τσεκαρει αν ειναι city or surname
     if (strcmp(key, "city") == 0)
     { 
       strcpy(srecord.index_key, city);
@@ -1475,6 +1476,10 @@ HT_ErrorCode SHT_SecondaryUpdateEntry (int indexDesc, UpdateRecordArray *updateA
 
     d = data + sizeof(int);
 
+    //εχει βρει σε ποιον καδο χασαρει
+    //εξεταζει τις εγραφες που υπαρχουν μεχρι να την βρει
+    //με βαση το old bucket&index
+    //επειτα ενημερωνει το bucket&index με το new tupleid
     while( d < data + BF_BLOCK_SIZE - 1)
     { 
       char key_i[20];
@@ -1902,6 +1907,7 @@ HT_ErrorCode SHT_InnerJoin(int sindexDesc1, int sindexDesc2,  char *index_key )
 
   data_1 = BF_Block_GetData(block);
   
+  //Βρίσκουμε το bucket το οποίο περιέχει τις εγγραφές που θέλουμε.
   while (num_of_ints_1 < a_1)
   {
 
@@ -1945,7 +1951,7 @@ HT_ErrorCode SHT_InnerJoin(int sindexDesc1, int sindexDesc2,  char *index_key )
         int *d_id = data11 + index_block * sizeof(Record) + sizeof(int);
         int id_1 = d_id[0];
         
-
+        //Βρίσκουμε τις εγγραφές στο πρώτο αρχείο που έχουν το κλειδί που θέλουμε.
         char name_1[15];
         char city_1[20];
         char surname_1[20];
@@ -1991,6 +1997,7 @@ HT_ErrorCode SHT_InnerJoin(int sindexDesc1, int sindexDesc2,  char *index_key )
             char *d_2_block = BF_Block_GetData(block) + sizeof(int);
             int num_in_bucket_2 = 0;
 
+            //Όσο το πλήθος των εγγραφών είναι μικρότερο ή ίσο από το πλήθος των εγγραφών που χωράνε στο bucket.
             while (num_in_bucket_2 <= BF_BLOCK_SIZE / sizeof( SecondaryRecord))
             {
               
@@ -2023,7 +2030,7 @@ HT_ErrorCode SHT_InnerJoin(int sindexDesc1, int sindexDesc2,  char *index_key )
               int id_2 = d_id[0];
               
 
-    
+              //Βρίσκουμε τις εγγραφές στο δεύτερο αρχείο που έχουν το κλειδί που θέλουμε.
               char *data1 = d4 + sizeof(int);
               strcpy(name_2, data1);
 
@@ -2176,5 +2183,3 @@ HT_ErrorCode SHT_InnerJoin(int sindexDesc1, int sindexDesc2,  char *index_key )
   return HT_OK;
 }
 
-
-// #endif // HASH_FILE_H
