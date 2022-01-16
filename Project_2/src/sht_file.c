@@ -11,7 +11,6 @@
 
 
 
-//////
 struct file_open{
   char* filename;
   int indexdesc;
@@ -37,6 +36,7 @@ FileTable filetable;
 
 
 HT_ErrorCode SHT_Init() {
+  
   //insert code here
   filetable = malloc(sizeof(struct table_file));
   filetable->size_table = 0;
@@ -100,12 +100,14 @@ HT_ErrorCode SHT_CreateSecondaryIndex(const char *sfileName, char *attrName, int
 
   //number of pointers in a block
   int num = BF_BLOCK_SIZE/sizeof(int);
+
   // num of blocks required for hash table
   int a = 1;
   for( int i = 0; i < depth; i++)
   {
     a = a*2;
   }
+
   int num_of_blocks = a/num;
   if(a % num >0){
     num_of_blocks++;
@@ -119,6 +121,7 @@ HT_ErrorCode SHT_CreateSecondaryIndex(const char *sfileName, char *attrName, int
   int num_of_ints = 0;
   data = BF_Block_GetData(block); //pairno to data
   int hash_block = 1;
+
   //FOR HASH-TABLE
   while (num_of_ints < a)        //ελεγχουμε αν χωραει στο ιδιο μπλοκ το αρχικο μας hash-table
   {
@@ -155,13 +158,12 @@ HT_ErrorCode SHT_CreateSecondaryIndex(const char *sfileName, char *attrName, int
 
   CALL_BF( BF_UnpinBlock( block));
 
-  // BF_Block_Destroy( &block);
+  BF_Block_Destroy( &block);
   return HT_OK;
 }
 
 HT_ErrorCode SHT_OpenSecondaryIndex(const char *sfileName, int *indexDesc  ) {
   //insert code here
-   //insert code here
   
   if(filetable->size_table == 20){
     return HT_ERROR;
@@ -243,7 +245,6 @@ int SHT_HashFunction( SecondaryRecord srecord, int depth)
 
 HT_ErrorCode SHT_CreateNewBucket( int filedesc, SecondaryRecord record, int bucket)
 {
-  // printf("cr n \n\n")
 
   //init for block
   BF_Block* block;
@@ -362,6 +363,7 @@ HT_ErrorCode SHT_CreateNewBucket( int filedesc, SecondaryRecord record, int buck
         num_info = 0;
         d1 = data1;
       }
+
       num_info++;
       previous_block = i;
       i = d1[0];
@@ -474,9 +476,9 @@ HT_ErrorCode SHT_CreateNewBucket( int filedesc, SecondaryRecord record, int buck
 
   int old_bucket = bucket;
   int new_bucket = dest;
+
   // ena bucket xoraei to poli 8 eggrafes eipame
-  // diavazp tis times aytes kai tis apothikeyo se ena pinaka pao record
-  
+  // diavazp tis times aytes kai tis apothikeyo se ena pinaka pao record  
   CALL_BF( BF_GetBlock(filedesc, old_bucket, block));
 
 
@@ -573,7 +575,7 @@ HT_ErrorCode SHT_CreateNewBucket( int filedesc, SecondaryRecord record, int buck
   int num_old = 0;
   int num_new = 0;
 
-
+  //tha hasharo palies kai nea timi
   for( int i = 0; i < (BF_BLOCK_SIZE -sizeof(int))/sizeof(record) + 1; i++)
   {
     record_old.tupleId.block = rec[i].tupleId.block;
@@ -657,8 +659,8 @@ HT_ErrorCode SHT_CreateNewBucket( int filedesc, SecondaryRecord record, int buck
       {
         fprintf( stderr,"Memory-Block is full\n");
         exit(EXIT_FAILURE);
-
       }
+
       //index-key
       memcpy( data + num_old*sizeof(SecondaryRecord) , key, sizeof(key));
       BF_Block_SetDirty(block);
@@ -1334,7 +1336,7 @@ HT_ErrorCode SHT_SecondaryInsertEntry (int indexDesc, SecondaryRecord record ) {
   return HT_OK;
 }
 
-
+//uodate the record
 HT_ErrorCode SHT_SecondaryUpdateEntry (int indexDesc, UpdateRecordArray *updateArray ) {
   // insert code here
   
@@ -1464,9 +1466,6 @@ HT_ErrorCode SHT_SecondaryUpdateEntry (int indexDesc, UpdateRecordArray *updateA
 
     //εχουμε βρει το καδο μας που χασαρουν τα index-key
     int bucket = d1[0];
-    // printf("bucket == %d\n", bucket);
-    int nummm_b;
-    BF_GetBlockCounter( filedesc, &nummm_b);
 
     CALL_BF(BF_UnpinBlock(block));
 
@@ -1480,6 +1479,8 @@ HT_ErrorCode SHT_SecondaryUpdateEntry (int indexDesc, UpdateRecordArray *updateA
     //εξεταζει τις εγραφες που υπαρχουν μεχρι να την βρει
     //με βαση το old bucket&index
     //επειτα ενημερωνει το bucket&index με το new tupleid
+    //check for this bucket if have srecord with key_i, tid_old.block and tid_old.index
+    //when i find it, i will update it and i will continue with next element from the array
     while( d < data + BF_BLOCK_SIZE - 1)
     { 
       char key_i[20];
@@ -1615,15 +1616,13 @@ HT_ErrorCode SHT_PrintAllEntries(int sindexDesc, char *index_key ) {
   strcpy( fileName, data11);
 
   int indexDesc;
-  int counterr = 0;
   CALL_BF( BF_OpenFile( fileName, &indexDesc));
+
+  //for-loop for all elements in the bucket
   while (d < data + BF_BLOCK_SIZE - 1)
   {
 
-    if( bucket == 14)
-    {
-      counterr++;
-    }
+    //if i find srecord with key i print it
     if ( strcmp( key, d) == 0)
     {
       int* d1 = d + sizeof(key);
@@ -1667,6 +1666,7 @@ HT_ErrorCode SHT_PrintAllEntries(int sindexDesc, char *index_key ) {
 }
 
 HT_ErrorCode SHT_HashStatistics(char *filename ) {
+  
   //insert code here
   int filedesc;
   CALL_BF(BF_OpenFile(filename, &filedesc));
@@ -1885,7 +1885,6 @@ HT_ErrorCode SHT_InnerJoin(int sindexDesc1, int sindexDesc2,  char *index_key )
   }
   ////////////////////////////////////////
 
-  // int num_of_blocks;
 
   
 
@@ -2180,6 +2179,8 @@ HT_ErrorCode SHT_InnerJoin(int sindexDesc1, int sindexDesc2,  char *index_key )
   HT_CloseFile(indexDesc1);
   HT_CloseFile(indexDesc2);
 
+  BF_Block_Destroy( &block);
+
+
   return HT_OK;
 }
-
