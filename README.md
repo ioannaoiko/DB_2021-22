@@ -19,7 +19,7 @@ In the `Second Exercise( Project_2)` we have create a database with hashing. We 
 
 
 ## Project Objective
-This project is Work from our fifth half year in [DIT]https://www.di.uoa.gr/.
+This project is Work from our fifth half year in [DIT.](https://www.di.uoa.gr/)
 
 
 ## Compilation
