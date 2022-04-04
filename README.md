@@ -1,7 +1,7 @@
 # DB_2021-22
 This project is a database with hashing.
 
-![Database](https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/World_map_with_four_colours.svg/2543px-World_map_with_four_colours.svg.png)
+![Database](https://miro.medium.com/max/750/0*rwqI3XKmDZgsVuxr.jpg)
 
 ## Our Team Members
 [Ioanna Oikonomou](https://github.com/ioannaoiko)
