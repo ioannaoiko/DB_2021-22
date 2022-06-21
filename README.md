@@ -13,13 +13,13 @@ This project is a database with hashing.
 git clone https://github.com/ioannaoiko/DB_2021-22
 ```
 ## Code
-In the `First Exercise( Project_1)` we have create a database with hashing. We use one index in this project.<br>
-In the `Second Exercise( Project_2)` we have create a database with hashing. We use two index in this project.
+In the `First Exercise( Project_1)` we have created a database with hashing and we use one index.<br>
+In the `Second Exercise( Project_2)` we have created a database with hashing and we use two index.
 
 
 
 ## Project Objective
-This project is Work from our fifth half year in [DIT.](https://www.di.uoa.gr/)
+This project is Work from our fifth semester in [DIT.](https://www.di.uoa.gr/)
 
 
 ## Compilation
