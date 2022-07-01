@@ -1,4 +1,4 @@
-# DB_2021-22
+# Data Base Implementation - Extendible Hashing
 This project is a database with hashing.
 
 ![Database](https://miro.medium.com/max/750/0*rwqI3XKmDZgsVuxr.jpg)
