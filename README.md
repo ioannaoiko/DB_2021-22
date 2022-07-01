@@ -1,5 +1,5 @@
 # Data Base Implementation - Extendible Hashing
-This project is a database with hashing.
+This project is our implementation for Extendible Hashing and Secondary Indexes for course named "Implementation of Data Base Systems".
 
 ![Database](https://miro.medium.com/max/750/0*rwqI3XKmDZgsVuxr.jpg)
 
@@ -13,7 +13,7 @@ This project is a database with hashing.
 git clone https://github.com/ioannaoiko/DB_2021-22
 ```
 ## Code
-In the `First Exercise( Project_1)` we have created a database with hashing and we use one index.<br>
+In the `First Exercise( Project_1)` we have implemented a database with hashing and we use one index.<br>
 In the `Second Exercise( Project_2)` we have created a database with hashing and we use two index.
 
 
