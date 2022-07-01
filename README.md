@@ -19,13 +19,11 @@ In the `Second Exercise( Project_2)` we developed the previous part by adding se
 
 
 ## Project Objective
-You can find the project objective for the second part [here.](
+You can find the project objective for the second part [here.](https://github.com/ioannaoiko/DB_2021-22/blob/main/DB_askisi_2_2021-2022.pdf)
 
 
 ## Compilation
-If you want to run the code, Change Project(1 or 2):
+If you want to run the code:
 ```
 cd Project_(i), i = 1,2
 make run
-```
-After you can check the database.
