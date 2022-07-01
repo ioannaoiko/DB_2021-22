@@ -13,13 +13,13 @@ This project is our implementation for Extendible Hashing and Secondary Indexes 
 git clone https://github.com/ioannaoiko/DB_2021-22
 ```
 ## Code
-In the `First Exercise( Project_1)` we have implemented a database with hashing and we use one index.<br>
-In the `Second Exercise( Project_2)` we have created a database with hashing and we use two index.
+In the `First Exercise( Project_1)` we implemented a database with extendible hashing.<br>
+In the `Second Exercise( Project_2)` we developed the previous part by adding secondary indexes.
 
 
 
 ## Project Objective
-This project is Work from our fifth semester in [DIT.](https://www.di.uoa.gr/)
+You can find the project objective for the second part [here.](
 
 
 ## Compilation
